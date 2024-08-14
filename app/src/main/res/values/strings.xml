@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">TaskApp</string>
+    <string name="app_title">MVVM Simple Sample</string>
+</resources>
