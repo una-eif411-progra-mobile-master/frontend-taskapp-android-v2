@@ -111,6 +111,7 @@ fun TaskApp(taskViewModel: TaskViewModel) {
             Spacer(modifier = Modifier.height(20.dp))
 
             // LazyColumn is used to create a scrollable list of tasks
+            // IMPORTANT: In the old version this was a RecyclerView
             LazyColumn(
                 modifier = Modifier.fillMaxSize()  // Fill the screen
             ) {
