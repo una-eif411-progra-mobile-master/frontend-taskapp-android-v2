@@ -5,19 +5,14 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -29,15 +24,11 @@ import edu.mike.frontend.taskapp.model.Status
 import edu.mike.frontend.taskapp.model.Task
 import edu.mike.frontend.taskapp.viewmodel.TaskViewModel
 import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import java.util.*
 
 /**
  * MainActivity is the entry point of the application.
  * It sets up the content view using Jetpack Compose and observes the task list from the ViewModel.
- *
- * Students should note that this activity does not use XML for layout.
- * Instead, the UI is built using Jetpack Compose components.
  */
 class MainActivity : ComponentActivity() {
 
@@ -72,33 +63,37 @@ class MainActivity : ComponentActivity() {
  */
 @Composable
 fun TaskApp(taskViewModel: TaskViewModel) {
-    // Observe the task list using collectAsState, so the UI updates automatically when the data changes
+    // Collect the current task list from the ViewModel
     val taskList by taskViewModel.taskList.collectAsState()
+
+    // State to track the selected task. Initially, select the first task if the list is not empty.
+    var selectedTask by remember {
+        mutableStateOf(taskList.firstOrNull())
+    }
 
     // Get the app name and title from the resources
     val appName = stringResource(id = R.string.app_name)
     val appTitle = stringResource(id = R.string.app_title)
 
-    // Surface is used to provide a background for the UI elements
+    // Display the UI
     Surface(
         modifier = Modifier
-            .fillMaxSize()  // Fill the available screen space
-            .padding(0.dp)  // No padding for the surface
+            .fillMaxSize()
+            .padding(0.dp)
     ) {
         Column {
-            // Display the app name as a large, centered title
+            // Display the app name and title
             Text(
                 text = appName,
-                fontSize = 34.sp,  // Set the font size to 34sp
+                fontSize = 34.sp,
                 color = Color.White,
                 modifier = Modifier
-                    .fillMaxWidth()  // Make the Text take up the full width of the screen
-                    .height(60.dp)   // Set the height of the Text
-                    .background(Color.Blue)  // Set the background color to blue
-                    .padding(8.dp)   // Add padding inside the Text
+                    .fillMaxWidth()
+                    .height(60.dp)
+                    .background(Color.Blue)
+                    .padding(8.dp)
             )
-            Spacer(modifier = Modifier.height(10.dp))  // Add space between the texts
-            // Display the app title
+            Spacer(modifier = Modifier.height(10.dp))
             Text(
                 text = appTitle,
                 fontSize = 20.sp,
@@ -110,14 +105,27 @@ fun TaskApp(taskViewModel: TaskViewModel) {
             )
             Spacer(modifier = Modifier.height(20.dp))
 
+            // Always show the selected task information (or a placeholder if no task is selected)
+            if (selectedTask != null) {
+                SelectedTaskInfo(task = selectedTask!!)
+            } else {
+                Text(
+                    text = "No task selected",
+                    fontSize = 20.sp,
+                    color = Color.Red,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
             // LazyColumn is used to create a scrollable list of tasks
-            // IMPORTANT: In the old version this was a RecyclerView
             LazyColumn(
                 modifier = Modifier.fillMaxSize()  // Fill the screen
             ) {
                 // Use items to iterate over the task list and display each task using the TaskItem composable
                 items(taskList) { task ->
-                    TaskItem(task = task)
+                    TaskItem(task = task, onClick = { selectedTask = it })
                 }
             }
         }
@@ -125,15 +133,36 @@ fun TaskApp(taskViewModel: TaskViewModel) {
 }
 
 /**
- * TaskItem is a composable function that displays the details of a task.
+ * SelectedTaskInfo is a composable that displays the details of the selected task.
+ * This composable is shown above the task list when a task is selected.
  *
- * Each task includes a title, notes, creation and due dates, priority, and status.
- * Students should pay attention to how data is passed into this function and how it's displayed.
- *
- * @param task The Task object to display.
+ * @param task The task whose details are displayed.
  */
 @Composable
-fun TaskItem(task: Task) {
+fun SelectedTaskInfo(task: Task) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .background(Color.Yellow)
+            .padding(16.dp)
+    ) {
+        Text(text = "Selected Task:", fontSize = 24.sp, color = Color.Black)
+        Text(text = "Title: ${task.title}", fontSize = 20.sp, color = Color.Black)
+        Text(text = "Notes: ${task.notes}", fontSize = 16.sp, color = Color.Gray)
+    }
+}
+
+/**
+ * TaskItem is a composable function that displays the details of a task.
+ *
+ * Each task includes a title and notes, and can be clicked to select the task.
+ *
+ * @param task The Task object to display.
+ * @param onClick The function to call when the task is clicked.
+ */
+@Composable
+fun TaskItem(task: Task, onClick: (Task) -> Unit) {
     // Format the dates for display using SimpleDateFormat
     val dateFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
     val createDate = dateFormatter.format(task.createDate)
@@ -142,10 +171,11 @@ fun TaskItem(task: Task) {
     // Column is used to vertically arrange the task details
     Column(
         modifier = Modifier
-            .fillMaxWidth()  // Make the Column take up the full width of the screen
-            .padding(8.dp)   // Add padding around the task item
-            .background(Color.LightGray)  // Set the background color to light gray
-            .padding(8.dp)   // Add padding inside the task item
+            .fillMaxWidth()
+            .padding(8.dp)
+            .background(Color.LightGray)
+            .padding(8.dp)
+            .clickable { onClick(task) }  // Make the task clickable
     ) {
         // Display the task title
         Text(
@@ -175,14 +205,13 @@ fun TaskItem(task: Task) {
             color = Color.DarkGray,
             modifier = Modifier.padding(bottom = 4.dp)
         )
-        // Display the task's priority
+        // Display the task's priority and status
         Text(
             text = "Priority: ${task.priority.label}",
             fontSize = 14.sp,
             color = Color.DarkGray,
             modifier = Modifier.padding(bottom = 4.dp)
         )
-        // Display the task's status
         Text(
             text = "Status: ${task.status.label}",
             fontSize = 14.sp,
@@ -201,7 +230,6 @@ fun TaskItem(task: Task) {
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
-    // Create a sample task for preview purposes
     val sampleTask = Task(
         id = 1L,
         title = "Sample Task",
@@ -212,8 +240,7 @@ fun DefaultPreview() {
         status = Status(1, "Pending")
     )
 
-    // Display the TaskItem using the sample data
     Surface {
-        TaskItem(task = sampleTask)
+        TaskItem(task = sampleTask, onClick = {})
     }
 }
