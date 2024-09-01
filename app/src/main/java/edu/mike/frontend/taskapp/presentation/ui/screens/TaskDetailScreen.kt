@@ -14,7 +14,7 @@ import androidx.navigation.NavController
 import edu.mike.frontend.taskapp.presentation.ui.layout.MainLayout
 import edu.mike.frontend.taskapp.presentation.viewmodel.TaskViewModel
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Locale
 
 /**
  * TaskDetailScreen is a composable function that displays the details of a specific task.
@@ -39,13 +39,41 @@ fun TaskDetailScreen(taskId: Int, taskViewModel: TaskViewModel, navController: N
                     .fillMaxSize()
                     .padding(16.dp)
             ) {
-                Text(text = "Task Details", fontSize = 24.sp, modifier = Modifier.padding(bottom = 16.dp))
-                Text(text = "Title: ${task.title}", fontSize = 20.sp, modifier = Modifier.padding(bottom = 8.dp))
-                Text(text = "Notes: ${task.notes}", fontSize = 16.sp, modifier = Modifier.padding(bottom = 8.dp))
-                Text(text = "Created On: ${dateFormatter.format(task.createDate)}", fontSize = 14.sp, modifier = Modifier.padding(bottom = 4.dp))
-                Text(text = "Due On: ${dateFormatter.format(task.dueDate)}", fontSize = 14.sp, modifier = Modifier.padding(bottom = 4.dp))
-                Text(text = "Priority: ${task.priority.label}", fontSize = 14.sp, modifier = Modifier.padding(bottom = 4.dp))
-                Text(text = "Status: ${task.status.label}", fontSize = 14.sp, modifier = Modifier.padding(bottom = 4.dp))
+                Text(
+                    text = "Task Details",
+                    fontSize = 24.sp,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+                Text(
+                    text = "Title: ${it.title}",
+                    fontSize = 20.sp,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                Text(
+                    text = "Notes: ${it.notes}",
+                    fontSize = 16.sp,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                Text(
+                    text = "Created On: ${dateFormatter.format(it.createDate)}",
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+                Text(
+                    text = "Due On: ${dateFormatter.format(it.dueDate)}",
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+                Text(
+                    text = "Priority: ${it.priority.label}",
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+                Text(
+                    text = "Status: ${it.status.label}",
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
 
                 // Button to go back to the task list
                 Button(
@@ -56,6 +84,7 @@ fun TaskDetailScreen(taskId: Int, taskViewModel: TaskViewModel, navController: N
                 }
             }
         } ?: run {
+            // If the task is not found, show an appropriate message
             Text(text = "Task not found", fontSize = 20.sp, modifier = Modifier.padding(16.dp))
         }
     }

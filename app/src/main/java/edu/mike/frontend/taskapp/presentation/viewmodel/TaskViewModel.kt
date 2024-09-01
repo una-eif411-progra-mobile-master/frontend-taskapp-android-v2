@@ -2,11 +2,11 @@ package edu.mike.frontend.taskapp.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import edu.mike.frontend.taskapp.data.datasource.TaskProvider
+import edu.mike.frontend.taskapp.data.model.Task
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import edu.mike.frontend.taskapp.data.model.Task
-import edu.mike.frontend.taskapp.data.datasource.TaskProvider
 
 /**
  * This class represents the ViewModel for managing tasks.
@@ -24,7 +24,7 @@ class TaskViewModel : ViewModel() {
     // Function to find and set the selected task by its ID
     fun selectTaskById(taskId: Int) {
         viewModelScope.launch {
-            val task = TaskProvider.findTaskById(taskId)
+            val task = taskList.value.find { it.id.toInt() == taskId }
             _selectedTask.value = task
         }
     }

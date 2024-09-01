@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">TaskApp</string>
     <string name="app_title">MVVM Simple Sample</string>
+    <string name="task_list">Task List</string>
+    <string name="task_detail">Task Detail</string>
+    <string name="settings">Settings</string>
 </resources>

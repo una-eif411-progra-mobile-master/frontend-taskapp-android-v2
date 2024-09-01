@@ -1,6 +1,8 @@
 package edu.mike.frontend.taskapp.presentation.ui.screens
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
@@ -11,8 +13,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import edu.mike.frontend.taskapp.presentation.ui.layout.MainLayout
 import edu.mike.frontend.taskapp.presentation.ui.components.TaskItem
+import edu.mike.frontend.taskapp.presentation.ui.layout.MainLayout
 import edu.mike.frontend.taskapp.presentation.viewmodel.TaskViewModel
 
 /**
@@ -30,7 +32,6 @@ fun TaskListScreen(navController: NavController, taskViewModel: TaskViewModel) {
 
     MainLayout {
         if (taskList.isEmpty()) {
-            // Display a message if the task list is empty
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -43,7 +44,7 @@ fun TaskListScreen(navController: NavController, taskViewModel: TaskViewModel) {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 16.dp)  // Adding padding if needed
+                    .padding(horizontal = 16.dp)
             ) {
                 items(taskList) { task ->
                     TaskItem(task = task, onClick = {
