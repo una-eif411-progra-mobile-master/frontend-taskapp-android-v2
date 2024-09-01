@@ -1,4 +1,4 @@
-package edu.mike.frontend.taskapp.ui.theme
+package edu.mike.frontend.taskapp.presentation.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

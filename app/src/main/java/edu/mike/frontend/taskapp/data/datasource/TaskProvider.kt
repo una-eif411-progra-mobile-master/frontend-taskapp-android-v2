@@ -1,5 +1,8 @@
-package edu.mike.frontend.taskapp.model
+package edu.mike.frontend.taskapp.data.datasource
 
+import edu.mike.frontend.taskapp.data.model.Priority
+import edu.mike.frontend.taskapp.data.model.Status
+import edu.mike.frontend.taskapp.data.model.Task
 import java.util.Date
 
 /**

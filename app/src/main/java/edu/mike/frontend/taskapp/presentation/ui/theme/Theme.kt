@@ -1,4 +1,4 @@
-package edu.mike.frontend.taskapp.ui.theme
+package edu.mike.frontend.taskapp.presentation.ui.theme
 
 import android.app.Activity
 import android.os.Build

@@ -1,4 +1,4 @@
-package edu.mike.frontend.taskapp.model
+package edu.mike.frontend.taskapp.data.model
 
 import java.util.*
 
