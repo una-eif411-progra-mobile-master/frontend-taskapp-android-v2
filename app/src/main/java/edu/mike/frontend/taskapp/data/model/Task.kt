@@ -6,11 +6,11 @@ import java.util.*
  * This class represents a Task
  */
 data class Task(
-    var id: Long,
-    var title: String,
-    var notes: String,
-    var createDate: Date,
-    var dueDate: Date,
-    var priority: Priority,
-    var status: Status,
+    val id: Int,
+    val title: String,
+    val notes: String,
+    val createDate: Date,
+    val dueDate: Date,
+    val priority: Priority,  // Nested priority object
+    val status: Status       // Nested status object
 )

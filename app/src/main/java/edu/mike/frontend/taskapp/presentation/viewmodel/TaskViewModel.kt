@@ -1,17 +1,23 @@
 package edu.mike.frontend.taskapp.presentation.viewmodel
 
+import edu.mike.frontend.taskapp.data.repository.TaskRepository
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import edu.mike.frontend.taskapp.data.datasource.TaskProvider
+import dagger.hilt.android.lifecycle.HiltViewModel
 import edu.mike.frontend.taskapp.data.model.Task
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * This class represents the ViewModel for managing tasks.
+ * It uses Hilt to inject the edu.mike.frontend.taskapp.data.repository.TaskRepository and fetch data from the network.
  */
-class TaskViewModel : ViewModel() {
+@HiltViewModel
+class TaskViewModel @Inject constructor(
+    private val taskRepository: TaskRepository
+) : ViewModel() {
 
     // StateFlow to hold the current task selected by ID
     private val _selectedTask = MutableStateFlow<Task?>(null)
@@ -24,25 +30,16 @@ class TaskViewModel : ViewModel() {
     // Function to find and set the selected task by its ID
     fun selectTaskById(taskId: Int) {
         viewModelScope.launch {
-            val task = taskList.value.find { it.id.toInt() == taskId }
-            _selectedTask.value = task
+            val task = taskRepository.getTaskById(taskId)
+            _selectedTask.value = task // Handle null if task not found
         }
     }
 
-    // Function to find and set a random task (for example usage)
-    fun getTask() {
+    // Function to fetch and set all tasks from the repository
+    fun findAllTasks() {
         viewModelScope.launch {
-            val position = (0..9).random()
-            val task = TaskProvider.findTaskById(position)
-            _selectedTask.value = task
-        }
-    }
-
-    // Function to find and set all tasks
-    fun findAllTask() {
-        viewModelScope.launch {
-            val taskList = TaskProvider.findAllTask()
-            _taskList.value = taskList
+            val taskList = taskRepository.getAllTasks()
+            _taskList.value = taskList ?: emptyList() // Handle empty list if no tasks found
         }
     }
 }
