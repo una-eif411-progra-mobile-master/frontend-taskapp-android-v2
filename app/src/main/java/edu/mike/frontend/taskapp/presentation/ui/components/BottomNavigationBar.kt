@@ -3,14 +3,17 @@ package edu.mike.frontend.taskapp.presentation.ui.components
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import edu.mike.frontend.taskapp.navigation.BottomNavItem
+import edu.mike.frontend.taskapp.presentation.viewmodel.LoginViewModel
 import edu.mike.frontend.taskapp.presentation.viewmodel.TaskViewModel
 
 /**
@@ -20,17 +23,26 @@ import edu.mike.frontend.taskapp.presentation.viewmodel.TaskViewModel
  *
  * @param navController The NavController used for navigation between screens.
  * @param taskViewModel The ViewModel instance used to observe the task data.
+ * @param loginViewModel The ViewModel instance used to handle the login state and logout.
  */
 @Composable
-fun BottomNavigationBar(navController: NavController, taskViewModel: TaskViewModel) {
+fun BottomNavigationBar(
+    navController: NavController,
+    taskViewModel: TaskViewModel,
+    loginViewModel: LoginViewModel,  // Added loginViewModel to handle logout
+    backgroundColor: Color = Color.Blue,
+    selectedItemColor: Color = Color.White,  // White for selected items
+    unselectedItemColor: Color = Color.Gray  // Gray for unselected items
+) {
     val items = listOf(
         BottomNavItem.TaskList,
         BottomNavItem.TaskDetail,
-        BottomNavItem.Settings
+        BottomNavItem.Settings,
+        BottomNavItem.Logout
     )
 
     NavigationBar(
-        containerColor = Color.Blue,
+        containerColor = backgroundColor,
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
@@ -43,7 +55,12 @@ fun BottomNavigationBar(navController: NavController, taskViewModel: TaskViewMod
                         contentDescription = stringResource(id = item.title)
                     )
                 },
-                label = { Text(text = stringResource(id = item.title)) },
+                label = {
+                    Text(
+                        text = stringResource(id = item.title),
+                        textAlign = TextAlign.Center
+                    )
+                },
                 selected = currentRoute == item.route,
                 onClick = {
                     when (item) {
@@ -57,6 +74,14 @@ fun BottomNavigationBar(navController: NavController, taskViewModel: TaskViewMod
                             }
                         }
 
+                        is BottomNavItem.Logout -> {
+                            // Handle logout action
+                            loginViewModel.logout()
+                            navController.navigate("login") {
+                                popUpTo(0) { inclusive = true }  // Clears the entire back stack
+                            }
+                        }
+
                         else -> {
                             navController.navigate(item.route) {
                                 navController.graph.startDestinationRoute?.let { route ->
@@ -67,7 +92,13 @@ fun BottomNavigationBar(navController: NavController, taskViewModel: TaskViewMod
                             }
                         }
                     }
-                }
+                },
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = Color.White,  // Set icons to white when selected
+                    unselectedIconColor = Color.Gray,  // Set icons to gray when unselected
+                    selectedTextColor = Color.White,  // Set text to white when selected
+                    unselectedTextColor = Color.Gray  // Set text to gray when unselected
+                )
             )
         }
     }

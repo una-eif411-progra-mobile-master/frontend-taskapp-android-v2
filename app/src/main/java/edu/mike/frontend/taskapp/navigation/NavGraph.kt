@@ -66,9 +66,16 @@ fun NavGraph(
                 )
             }
         }
-        // Placeholder for the settings screen
+        // Define the composable for the settings screen
         composable(BottomNavItem.Settings.route) {
-            // SettingsScreen()
+            // SettingsScreen() // Uncomment if needed
+        }
+        // Define the composable for the logout functionality
+        composable(BottomNavItem.Logout.route) {
+            loginViewModel.logout() // Call the logout function
+            navController.navigate("login") {
+                popUpTo(BottomNavItem.TaskList.route) { inclusive = true }
+            }
         }
     }
 }

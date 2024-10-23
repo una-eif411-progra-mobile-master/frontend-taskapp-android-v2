@@ -36,7 +36,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Fetch all tasks when the activity is created.
+        // Fetch all tasks when the activity is created
         taskViewModel.findAllTasks()
 
         setContent {
@@ -58,7 +58,8 @@ class MainActivity : ComponentActivity() {
 
                     // Show bottom navigation bar only if the current screen is not "login"
                     if (currentRoute != "login") {
-                        BottomNavigationBar(navController, taskViewModel)
+                        // Pass both loginViewModel and taskViewModel to BottomNavigationBar
+                        BottomNavigationBar(navController, taskViewModel, loginViewModel)
                     }
                 }
             ) { innerPadding ->

@@ -2,6 +2,7 @@ package edu.mike.frontend.taskapp.navigation
 
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
@@ -36,4 +37,9 @@ sealed class BottomNavItem(
      * Settings represents the navigation item for the settings screen.
      */
     object Settings : BottomNavItem("settings", R.string.settings, Icons.Filled.Settings)
+
+    /**
+     * Logout represents the navigation item for the logout functionality.
+     */
+    object Logout : BottomNavItem("logout", R.string.logout, Icons.AutoMirrored.Filled.ExitToApp)
 }
