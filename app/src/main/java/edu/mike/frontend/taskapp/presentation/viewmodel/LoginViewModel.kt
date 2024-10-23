@@ -58,9 +58,4 @@ class LoginViewModel @Inject constructor(
         tokenManager.clearToken() // Clear the token via TokenManager
         _isLoggedIn.value = false
     }
-
-    // Retrieve the JWT token via TokenManager
-    fun getToken(): String? {
-        return tokenManager.getToken()
-    }
 }
