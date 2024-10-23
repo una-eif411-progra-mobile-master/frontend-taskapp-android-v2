@@ -37,8 +37,8 @@ fun LoginScreen(
     onLoginSuccess: () -> Unit
 ) {
     // State variables for username, password, and login error
-    var username by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("user") }
+    var password by remember { mutableStateOf("password") }
     var loginError by remember { mutableStateOf(false) }
 
     // Center the login form

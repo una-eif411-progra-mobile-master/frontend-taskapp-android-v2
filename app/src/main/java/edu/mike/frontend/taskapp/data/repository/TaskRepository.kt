@@ -1,10 +1,7 @@
 package edu.mike.frontend.taskapp.data.repository
 
-import edu.mike.frontend.taskapp.data.model.LoginRequest
-import edu.mike.frontend.taskapp.data.model.LoginResponse
 import edu.mike.frontend.taskapp.data.model.Task
 import edu.mike.frontend.taskapp.data.network.TaskService
-import retrofit2.Response
 import javax.inject.Inject
 
 /**
@@ -58,17 +55,5 @@ class TaskRepository @Inject constructor(
             e.printStackTrace()
             null
         }
-    }
-
-    /**
-     * Logs in a user with the provided credentials.
-     *
-     * @param username The username of the user.
-     * @param password The password of the user.
-     * @return The LoginResponse object or null if an error occurs.
-     */
-    suspend fun login(username: String, password: String): LoginResponse? {
-        val response: Response<LoginResponse> = taskService.login(LoginRequest(username, password))
-        return if (response.isSuccessful) response.body() else null
     }
 }
