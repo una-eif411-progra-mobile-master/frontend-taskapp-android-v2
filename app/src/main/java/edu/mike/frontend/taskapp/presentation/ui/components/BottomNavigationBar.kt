@@ -29,10 +29,8 @@ import edu.mike.frontend.taskapp.presentation.viewmodel.TaskViewModel
 fun BottomNavigationBar(
     navController: NavController,
     taskViewModel: TaskViewModel,
-    loginViewModel: LoginViewModel,  // Added loginViewModel to handle logout
-    backgroundColor: Color = Color.Blue,
-    selectedItemColor: Color = Color.White,  // White for selected items
-    unselectedItemColor: Color = Color.Gray  // Gray for unselected items
+    loginViewModel: LoginViewModel,
+    backgroundColor: Color = Color.Blue
 ) {
     val items = listOf(
         BottomNavItem.TaskList,
