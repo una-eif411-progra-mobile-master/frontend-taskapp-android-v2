@@ -6,11 +6,14 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import edu.mike.frontend.taskapp.navigation.NavGraph
 import edu.mike.frontend.taskapp.presentation.ui.components.BottomNavigationBar
+import edu.mike.frontend.taskapp.presentation.viewmodel.LoginViewModel
 import edu.mike.frontend.taskapp.presentation.viewmodel.TaskViewModel
 
 /**
@@ -26,21 +29,10 @@ import edu.mike.frontend.taskapp.presentation.viewmodel.TaskViewModel
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    // The TaskViewModel instance is obtained using the viewModels() delegate, which allows
-    // this activity to share the same instance of the view model across configuration changes
-    // such as screen rotations.
+    // ViewModel instances for login and task management
+    private val loginViewModel: LoginViewModel by viewModels()
     private val taskViewModel: TaskViewModel by viewModels()
 
-    /**
-     * The onCreate method is called when the activity is first created. It sets up the UI and
-     * initializes components such as the task list and navigation.
-     *
-     * In this method:
-     *  - The [taskViewModel] fetches all tasks.
-     *  - The [setContent] block sets the composable layout for the activity.
-     *  - The [Scaffold] composable is used to provide a structured layout that includes a
-     *    bottom navigation bar and content space.
-     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -59,16 +51,21 @@ class MainActivity : ComponentActivity() {
              *   [NavGraph] for navigation between different screens.
              */
             Scaffold(
-                // The BottomNavigationBar is provided as the bottom bar for the Scaffold. It allows
-                // navigation between different sections of the app, such as Task List and Settings.
-                bottomBar = { BottomNavigationBar(navController, taskViewModel) }
+                bottomBar = {
+                    // Get the current back stack entry to determine the current route
+                    val navBackStackEntry by navController.currentBackStackEntryAsState()
+                    val currentRoute = navBackStackEntry?.destination?.route
+
+                    // Show bottom navigation bar only if the current screen is not "login"
+                    if (currentRoute != "login") {
+                        BottomNavigationBar(navController, taskViewModel)
+                    }
+                }
             ) { innerPadding ->
-                // The content area is handled by the NavGraph composable, which defines
-                // the navigation logic between screens (Task List, Task Details, etc.).
-                // The `innerPadding` ensures the content is correctly padded, avoiding overlap
-                // with the bottom navigation bar.
+                // Set up the navigation graph with the collected padding
                 NavGraph(
                     navController = navController,
+                    loginViewModel = loginViewModel,
                     taskViewModel = taskViewModel,
                     modifier = Modifier.padding(innerPadding)  // Pass the innerPadding as the modifier
                 )

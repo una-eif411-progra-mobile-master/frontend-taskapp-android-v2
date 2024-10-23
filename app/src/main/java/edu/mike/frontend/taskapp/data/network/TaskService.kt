@@ -1,8 +1,12 @@
 package edu.mike.frontend.taskapp.data.network
 
+import edu.mike.frontend.taskapp.data.model.LoginRequest
+import edu.mike.frontend.taskapp.data.model.LoginResponse
 import edu.mike.frontend.taskapp.data.model.Task
 import retrofit2.Response
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Path
 
 /**
@@ -26,4 +30,13 @@ interface TaskService {
      */
     @GET("tasks/{id}")
     suspend fun getTaskById(@Path("id") id: Int): Response<Task>
+
+    /**
+     * Logs in a user with the provided credentials.
+     *
+     * @param loginRequest The LoginRequest object containing the user's credentials.
+     * @return A Response object containing the LoginResponse object.
+     */
+    @POST("users/login")
+    suspend fun login(@Body loginRequest: LoginRequest): Response<LoginResponse>
 }
