@@ -39,7 +39,7 @@ fun LoginScreen(
 ) {
     // State variables for username, password
     var username by remember { mutableStateOf("admin@guzmanalan.com") } // Set default username here
-    var password by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("12345") }
 
     // Observe the login error and login state
     val isLoggedIn by loginViewModel.isLoggedIn.collectAsStateWithLifecycle()

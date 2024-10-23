@@ -19,14 +19,16 @@ class LoginRepository @Inject constructor(
      *
      * @param username The username of the user.
      * @param password The password of the user.
-     * @return The LoginResponse object or null if an error occurs.
+     * @return A Pair containing the LoginResponse object and the JWT token, or null if an error occurs.
      */
-    suspend fun login(username: String, password: String): Result<LoginResponse?> {
+    suspend fun login(username: String, password: String): Result<Pair<LoginResponse?, String?>> {
         return try {
             val response: Response<LoginResponse> =
                 loginService.login(LoginRequest(username, password))
             if (response.isSuccessful) {
-                Result.success(response.body())
+                // Extract the JWT token from the header (assuming it's in the "Authorization" header)
+                val token = response.headers()["Authorization"]?.replace("Bearer ", "")
+                Result.success(Pair(response.body(), token))
             } else {
                 Result.failure(Exception("Login failed: ${response.message()}"))
             }

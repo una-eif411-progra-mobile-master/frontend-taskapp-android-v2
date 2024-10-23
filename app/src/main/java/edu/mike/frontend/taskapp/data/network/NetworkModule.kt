@@ -1,12 +1,16 @@
 package edu.mike.frontend.taskapp.data.network
 
+import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import edu.mike.frontend.taskapp.data.model.Task
+import edu.mike.frontend.taskapp.utils.TokenManager
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -20,6 +24,18 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
+
+    /**
+     * Provides a singleton instance of TokenManager.
+     *
+     * @param context The application context.
+     * @return A TokenManager instance.
+     */
+    @Provides
+    @Singleton
+    fun provideTokenManager(@ApplicationContext context: Context): TokenManager {
+        return TokenManager(context)
+    }
 
     /**
      * Provides a singleton instance of Gson configured with a custom deserializer for Task.
@@ -53,17 +69,40 @@ object NetworkModule {
     }
 
     /**
-     * Provides a singleton instance of OkHttpClient configured with the logging interceptor.
+     * Provides an interceptor to add the JWT token to the Authorization header for every request.
+     *
+     * @param tokenManager The TokenManager instance to get the stored token.
+     * @return A configured Interceptor that adds the token to each request.
+     */
+    @Provides
+    @Singleton
+    fun provideAuthInterceptor(tokenManager: TokenManager): Interceptor {
+        return Interceptor { chain ->
+            val requestBuilder = chain.request().newBuilder()
+            tokenManager.getToken()?.let { token ->
+                requestBuilder.addHeader("Authorization", "Bearer $token")
+            }
+            chain.proceed(requestBuilder.build())
+        }
+    }
+
+    /**
+     * Provides a singleton instance of OkHttpClient configured with the logging and authentication interceptors.
      * OkHttpClient handles the network layer and intercepts the HTTP requests.
      *
      * @param loggingInterceptor The HttpLoggingInterceptor instance to log the network traffic.
+     * @param authInterceptor The Interceptor to add the JWT token to each request.
      * @return A configured OkHttpClient instance.
      */
     @Provides
     @Singleton
-    fun provideOkHttpClient(loggingInterceptor: HttpLoggingInterceptor): OkHttpClient {
+    fun provideOkHttpClient(
+        loggingInterceptor: HttpLoggingInterceptor,
+        authInterceptor: Interceptor
+    ): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor) // Add logging interceptor to OkHttpClient
+            .addInterceptor(authInterceptor) // Add token interceptor
             .build()
     }
 

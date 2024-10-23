@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import edu.mike.frontend.taskapp.data.repository.LoginRepository
+import edu.mike.frontend.taskapp.utils.TokenManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -14,7 +15,8 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val loginRepository: LoginRepository // Inject the login repository
+    private val loginRepository: LoginRepository, // Inject the login repository
+    private val tokenManager: TokenManager // Inject the TokenManager
 ) : ViewModel() {
 
     // StateFlow to hold the login status
@@ -31,8 +33,11 @@ class LoginViewModel @Inject constructor(
     fun login(username: String, password: String) {
         viewModelScope.launch {
             val result = loginRepository.login(username, password)
-            result.onSuccess { loginResponse ->
-                if (loginResponse != null) {
+            result.onSuccess { (loginResponse, token) ->
+                if (loginResponse != null && token != null) {
+                    // Store the JWT token via the TokenManager after successful login
+                    tokenManager.saveToken(token)
+
                     _isLoggedIn.value = true
                     _loginError.value = null
                 } else {
@@ -50,6 +55,12 @@ class LoginViewModel @Inject constructor(
      * Function to handle logout logic.
      */
     fun logout() {
+        tokenManager.clearToken() // Clear the token via TokenManager
         _isLoggedIn.value = false
+    }
+
+    // Retrieve the JWT token via TokenManager
+    fun getToken(): String? {
+        return tokenManager.getToken()
     }
 }
