@@ -79,7 +79,7 @@ object NetworkModule {
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient, gson: Gson): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://628ae68e667aea3a3e23e474.mockapi.io/api/v1/") // Base URL for API calls
+            .baseUrl(NetworkConfig.BASE_URL) // Use the base URL from the configuration object
             .addConverterFactory(GsonConverterFactory.create(gson)) // Add Gson converter for JSON parsing
             .client(okHttpClient) // Attach OkHttpClient for making network requests
             .build()
@@ -96,5 +96,18 @@ object NetworkModule {
     @Singleton
     fun provideTaskService(retrofit: Retrofit): TaskService {
         return retrofit.create(TaskService::class.java)
+    }
+
+    /**
+     * Provides a singleton instance of LoginService created by Retrofit.
+     * This service is used to define and make API calls related to user login.
+     *
+     * @param retrofit The Retrofit instance used to create the service.
+     * @return A LoginService instance to handle API requests.
+     */
+    @Provides
+    @Singleton
+    fun provideLoginService(retrofit: Retrofit): LoginService {
+        return retrofit.create(LoginService::class.java)
     }
 }

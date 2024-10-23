@@ -1,6 +1,29 @@
 package edu.mike.frontend.taskapp.data.model
 
 /**
- * This class represents the response of a login request
+ * Data class representing the login response returned from the API.
+ *
+ * @property username The username of the authenticated user.
+ * @property authorities The list of authorities/privileges associated with the user.
+ * @property accountNonExpired Indicates if the account is non-expired.
+ * @property accountNonLocked Indicates if the account is non-locked.
+ * @property credentialsNonExpired Indicates if the credentials are non-expired.
+ * @property enabled Indicates if the account is enabled.
  */
-data class LoginResponse(val token: String, val userId: Long)
+data class LoginResponse(
+    val username: String,
+    val authorities: List<Authority>,
+    val accountNonExpired: Boolean,
+    val accountNonLocked: Boolean,
+    val credentialsNonExpired: Boolean,
+    val enabled: Boolean
+)
+
+/**
+ * Data class representing a user's authority or privilege.
+ *
+ * @property authority The name of the authority or privilege.
+ */
+data class Authority(
+    val authority: String
+)

@@ -2,28 +2,49 @@ package edu.mike.frontend.taskapp.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import edu.mike.frontend.taskapp.data.model.LoginRequest
+import edu.mike.frontend.taskapp.data.network.LoginService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * ViewModel for handling user login state.
  */
-class LoginViewModel : ViewModel() {
+@HiltViewModel
+class LoginViewModel @Inject constructor(
+    private val loginService: LoginService // Inject the login service
+) : ViewModel() {
 
     // StateFlow to hold the login status
     private val _isLoggedIn = MutableStateFlow(false)
     val isLoggedIn: StateFlow<Boolean> get() = _isLoggedIn
 
+    // StateFlow to hold the error message (for login failurahhhes)
+    private val _loginError = MutableStateFlow<String?>(null)
+    val loginError: StateFlow<String?> get() = _loginError
+
     /**
-     * Function to handle login logic.
-     * You can replace this logic with actual login API call or authentication logic.
+     * Function to handle login logic using LoginRequest object.
      */
     fun login(username: String, password: String) {
-        // Simulate login process (replace with real login logic)
+        val loginRequest = LoginRequest(username, password)
         viewModelScope.launch {
-            // Simulate login success
-            _isLoggedIn.value = true
+            try {
+                val response = loginService.login(loginRequest)
+                if (response.isSuccessful) {
+                    _isLoggedIn.value = true
+                    _loginError.value = null
+                } else {
+                    _isLoggedIn.value = false
+                    _loginError.value = "Login failed. Please check your credentials."
+                }
+            } catch (e: Exception) {
+                _isLoggedIn.value = false
+                _loginError.value = "An error occurred: ${e.message}"
+            }
         }
     }
 
@@ -32,23 +53,5 @@ class LoginViewModel : ViewModel() {
      */
     fun logout() {
         _isLoggedIn.value = false
-    }
-
-    /**
-     * Function to validate the user credentials.
-     *
-     * @param username The input username.
-     * @param password The input password.
-     * @return A boolean indicating whether the credentials are valid.
-     */
-    fun validateCredentials(username: String, password: String): Boolean {
-        // Example credentials validation logic (this is just a simple example).
-        return if (username == "user" && password == "password") {
-            _isLoggedIn.value = true
-            true
-        } else {
-            _isLoggedIn.value = false
-            false
-        }
     }
 }

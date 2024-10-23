@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import edu.mike.frontend.taskapp.presentation.viewmodel.LoginViewModel
 
 /**
@@ -36,10 +37,13 @@ fun LoginScreen(
     loginViewModel: LoginViewModel,
     onLoginSuccess: () -> Unit
 ) {
-    // State variables for username, password, and login error
-    var username by remember { mutableStateOf("") }
+    // State variables for username, password
+    var username by remember { mutableStateOf("admin@guzmanalan.com") } // Set default username here
     var password by remember { mutableStateOf("") }
-    var loginError by remember { mutableStateOf(false) }
+
+    // Observe the login error and login state
+    val isLoggedIn by loginViewModel.isLoggedIn.collectAsStateWithLifecycle()
+    val loginError by loginViewModel.loginError.collectAsStateWithLifecycle()
 
     // Center the login form
     Box(
@@ -60,7 +64,6 @@ fun LoginScreen(
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            // Spacer for better spacing
             Spacer(modifier = Modifier.height(16.dp))
 
             // Username Label and Input Field
@@ -89,13 +92,7 @@ fun LoginScreen(
             // Login Button
             Button(
                 onClick = {
-                    val isValid = loginViewModel.validateCredentials(username, password)
-                    if (isValid) {
-                        loginError = false
-                        onLoginSuccess()
-                    } else {
-                        loginError = true
-                    }
+                    loginViewModel.login(username, password)
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -103,15 +100,20 @@ fun LoginScreen(
             }
 
             // Show error message if login fails
-            if (loginError) {
+            if (loginError != null) {
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    "Invalid credentials. Please try again.",
+                    loginError!!,
                     color = Color.Red,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
                 )
             }
         }
+    }
+
+    // Navigate to the next screen on successful login
+    if (isLoggedIn) {
+        onLoginSuccess()
     }
 }
