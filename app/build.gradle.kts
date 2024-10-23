@@ -24,6 +24,11 @@ android {
         }
     }
 
+    buildFeatures {
+        buildConfig = true
+        compose = true
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -33,15 +38,48 @@ android {
             )
         }
     }
+
+    // Define product flavors here
+    flavorDimensions += "environment"
+
+    // Then define product flavors
+    productFlavors {
+        create("devLocal") {
+            dimension = "environment"
+            buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8080/v1/\"")
+            applicationIdSuffix = ".devlocal"
+            versionNameSuffix = "-devlocal"
+        }
+        create("devHeroku") {
+            dimension = "environment"
+            buildConfigField("String", "BASE_URL", "\"https://task-app-v01.herokuapp.com/v1/\"")
+            applicationIdSuffix = ".devheroku"
+            versionNameSuffix = "-devheroku"
+        }
+        create("prod") {
+            dimension = "environment"
+            buildConfigField("String", "BASE_URL", "\"https://task-app-v01.herokuapp.com/v1/\"")
+            applicationIdSuffix = ".prod"
+            versionNameSuffix = "-prod"
+        }
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
         jvmTarget = "17"
-    }
-    buildFeatures {
-        compose = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.15"

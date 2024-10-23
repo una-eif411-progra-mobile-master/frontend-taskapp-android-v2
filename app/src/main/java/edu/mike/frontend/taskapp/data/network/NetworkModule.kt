@@ -8,6 +8,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import edu.mike.frontend.taskapp.BuildConfig
 import edu.mike.frontend.taskapp.data.model.Task
 import edu.mike.frontend.taskapp.utils.TokenManager
 import okhttp3.Interceptor
@@ -118,7 +119,7 @@ object NetworkModule {
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient, gson: Gson): Retrofit {
         return Retrofit.Builder()
-            .baseUrl(NetworkConfig.BASE_URL) // Use the base URL from the configuration object
+            .baseUrl(BuildConfig.BASE_URL) // Use the base URL from the configuration object
             .addConverterFactory(GsonConverterFactory.create(gson)) // Add Gson converter for JSON parsing
             .client(okHttpClient) // Attach OkHttpClient for making network requests
             .build()

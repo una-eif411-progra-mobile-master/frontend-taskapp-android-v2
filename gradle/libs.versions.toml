@@ -12,10 +12,10 @@ navigationRuntimeKtx = "2.8.3"
 navigation-compose = "2.8.3"
 hilt = "2.52"
 ben-manes = "0.51.0"
-retrofit = "2.9.0"
-converterGson = "2.9.0"
-okhttp = "4.11.0"
-okhttp-logging-interceptor = "4.11.0"
+retrofit = "2.11.0"
+converterGson = "2.11.0"
+okhttp = "4.12.0"
+okhttp-logging-interceptor = "4.12.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
