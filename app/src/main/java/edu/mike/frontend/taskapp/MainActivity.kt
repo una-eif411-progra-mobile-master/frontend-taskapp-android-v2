@@ -31,39 +31,36 @@ import edu.mike.frontend.taskapp.viewmodel.TaskViewModel
 
 /**
  * MainActivity is the entry point of the application.
- * It sets up the content view using Jetpack Compose.
+ * It sets the content view to the TaskApp composable function.
  */
 class MainActivity : ComponentActivity() {
 
     // ViewModel instance for managing UI-related data
     private val taskViewModel: TaskViewModel by viewModels()
 
-    // Called when the activity is starting
+    /**
+     * Called when the activity is starting.
+     * @param savedInstanceState If the activity is being re-initialized after previously being shut down then this Bundle contains the data it most recently supplied in onSaveInstanceState(Bundle).
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            // Set the content of the activity to the TaskApp composable
             TaskApp(taskViewModel)
         }
     }
 }
 
 /**
- * TaskApp is the main composable function that sets up the UI.
- * It observes the task state from the ViewModel and displays the UI accordingly.
- *
- * @param taskViewModel The ViewModel instance to observe the task state.
+ * TaskApp is a composable function that displays the task application UI.
+ * @param taskViewModel The ViewModel instance for managing UI-related data.
  */
 @Composable
 fun TaskApp(taskViewModel: TaskViewModel) {
-    // Collect the current task state from the ViewModel
     val task by taskViewModel.task.collectAsState()
 
-    // Get the app name and title from the resources
     val appName = stringResource(id = R.string.app_name)
     val appTitle = stringResource(id = R.string.app_title)
 
-    // Display the UI
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -72,13 +69,11 @@ fun TaskApp(taskViewModel: TaskViewModel) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                // Trigger the getTask method when the user clicks the screen
                 .clickable { taskViewModel.getTask() },
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             item {
-                // Display the app name
                 Text(
                     text = appName,
                     fontSize = 34.sp,
@@ -90,7 +85,6 @@ fun TaskApp(taskViewModel: TaskViewModel) {
                         .padding(8.dp)
                 )
                 Spacer(modifier = Modifier.height(10.dp))
-                // Display the app title
                 Text(
                     text = appTitle,
                     fontSize = 20.sp,
@@ -103,7 +97,6 @@ fun TaskApp(taskViewModel: TaskViewModel) {
                 Spacer(modifier = Modifier.height(20.dp))
             }
             item {
-                // Display the task content
                 TaskContent(task)
             }
         }
@@ -112,9 +105,7 @@ fun TaskApp(taskViewModel: TaskViewModel) {
 
 /**
  * TaskContent is a composable function that displays the details of a task.
- * If the task is null, it displays a message indicating no task is available.
- *
- * @param task The task to display.
+ * @param task The task to be displayed.
  */
 @Composable
 fun TaskContent(task: Task?) {
@@ -124,9 +115,8 @@ fun TaskContent(task: Task?) {
             .padding(20.dp)
     ) {
         if (task != null) {
-            // Display the task title
             Text(
-                text = "Title:",
+                text = stringResource(id = R.string.task_title),
                 fontSize = 16.sp,
                 color = Color.Gray,
                 modifier = Modifier
@@ -140,9 +130,8 @@ fun TaskContent(task: Task?) {
                     .fillMaxWidth()
                     .padding(bottom = 16.dp)
             )
-            // Display the task notes
             Text(
-                text = "Notes:",
+                text = stringResource(id = R.string.task_notes),
                 fontSize = 16.sp,
                 color = Color.Gray,
                 modifier = Modifier
@@ -157,9 +146,8 @@ fun TaskContent(task: Task?) {
                     .padding(bottom = 16.dp)
             )
         } else {
-            // Display a message if no task is available
             Text(
-                text = "No task available",
+                text = stringResource(id = R.string.no_task_available),
                 fontSize = 20.sp,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -168,8 +156,7 @@ fun TaskContent(task: Task?) {
 }
 
 /**
- * DefaultPreview is a composable function that provides a preview of the TaskApp.
- * It is used for UI development in Android Studio.
+ * DefaultPreview is a composable function that displays a preview of the TaskApp UI.
  */
 @Preview(showBackground = true)
 @Composable

@@ -1,16 +1,23 @@
 package edu.mike.frontend.taskapp.model
 
-import java.util.*
+import java.util.Date
 
 /**
- * This class represents a Task
+ * This class represents a Task.
+ * @property id The unique identifier of the task.
+ * @property title The title of the task.
+ * @property notes The notes associated with the task.
+ * @property createdDate The date the task was created.
+ * @property dueDate The date the task is due.
+ * @property priority The priority of the task.
+ * @property status The status of the task.
  */
 data class Task(
-    var id: Long,
-    var title: String,
-    var notes: String,
-    var createDate: Date,
-    var dueDate: Date,
-    var priority: Priority,
-    var status: Status,
+    val id: Long,
+    val title: String,
+    val notes: String,
+    val createdDate: Date,
+    val dueDate: Date,
+    val priority: Priority,
+    val status: Status
 )
