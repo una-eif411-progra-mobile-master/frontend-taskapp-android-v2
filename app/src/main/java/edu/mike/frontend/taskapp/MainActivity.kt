@@ -26,7 +26,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import edu.mike.frontend.taskapp.model.Task
+import edu.mike.frontend.taskapp.viewmodel.TaskState
 import edu.mike.frontend.taskapp.viewmodel.TaskViewModel
 
 /**
@@ -56,7 +56,7 @@ class MainActivity : ComponentActivity() {
  */
 @Composable
 fun TaskApp(taskViewModel: TaskViewModel) {
-    val task by taskViewModel.task.collectAsState()
+    val taskState by taskViewModel.task.collectAsState()
 
     val appName = stringResource(id = R.string.app_name)
     val appTitle = stringResource(id = R.string.app_title)
@@ -97,60 +97,72 @@ fun TaskApp(taskViewModel: TaskViewModel) {
                 Spacer(modifier = Modifier.height(20.dp))
             }
             item {
-                TaskContent(task)
+                TaskContent(taskState)
             }
         }
     }
 }
 
 /**
- * TaskContent is a composable function that displays the details of a task.
- * @param task The task to be displayed.
+ * TaskContent is a composable function that displays the details of a task based on its state.
+ * @param taskState The state representing the task.
  */
 @Composable
-fun TaskContent(task: Task?) {
+fun TaskContent(taskState: TaskState) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(20.dp)
     ) {
-        if (task != null) {
-            Text(
-                text = stringResource(id = R.string.task_title),
-                fontSize = 16.sp,
-                color = Color.Gray,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 4.dp)
-            )
-            Text(
-                text = task.title,
-                fontSize = 20.sp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp)
-            )
-            Text(
-                text = stringResource(id = R.string.task_notes),
-                fontSize = 16.sp,
-                color = Color.Gray,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 4.dp)
-            )
-            Text(
-                text = task.notes,
-                fontSize = 24.sp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp)
-            )
-        } else {
-            Text(
-                text = stringResource(id = R.string.no_task_available),
-                fontSize = 20.sp,
-                modifier = Modifier.fillMaxWidth()
-            )
+        when (taskState) {
+            is TaskState.Loading -> {
+                Text(
+                    text = "Loading...",
+                    fontSize = 20.sp,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            is TaskState.Success -> {
+                Text(
+                    text = stringResource(id = R.string.task_title),
+                    fontSize = 16.sp,
+                    color = Color.Gray,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 4.dp)
+                )
+                Text(
+                    text = taskState.task.title,
+                    fontSize = 20.sp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp)
+                )
+                Text(
+                    text = stringResource(id = R.string.task_notes),
+                    fontSize = 16.sp,
+                    color = Color.Gray,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 4.dp)
+                )
+                Text(
+                    text = taskState.task.notes,
+                    fontSize = 24.sp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp)
+                )
+            }
+
+            is TaskState.Empty -> {
+                Text(
+                    text = stringResource(id = R.string.no_task_available),
+                    fontSize = 20.sp,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
         }
     }
 }

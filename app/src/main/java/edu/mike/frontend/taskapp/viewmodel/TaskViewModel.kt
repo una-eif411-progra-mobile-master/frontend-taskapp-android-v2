@@ -9,14 +9,23 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 /**
+ * Sealed class to represent different states of the task.
+ */
+sealed class TaskState {
+    data object Loading : TaskState()
+    data class Success(val task: Task) : TaskState()
+    data object Empty : TaskState()
+}
+
+/**
  * ViewModel for managing UI-related data in a lifecycle-conscious way.
  * It allows data to survive configuration changes such as screen rotations.
  */
 class TaskViewModel : ViewModel() {
 
-    // MutableStateFlow to hold the current task
-    private val _task = MutableStateFlow<Task?>(null)
-    val task: StateFlow<Task?> get() = _task
+    // MutableStateFlow to hold the current task state
+    private val _task = MutableStateFlow<TaskState>(TaskState.Empty)
+    val task: StateFlow<TaskState> get() = _task
 
     // MutableStateFlow to hold the list of all tasks
     private val _taskList = MutableStateFlow<List<Task>>(emptyList())
@@ -27,9 +36,10 @@ class TaskViewModel : ViewModel() {
      */
     fun getTask() {
         viewModelScope.launch {
+            _task.value = TaskState.Loading
             val position = (0..9).random()
             val task = TaskProvider.findTaskById(position)
-            _task.value = task
+            _task.value = task?.let { TaskState.Success(it) } ?: TaskState.Empty
         }
     }
 
