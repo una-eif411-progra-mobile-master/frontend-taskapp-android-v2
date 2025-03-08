@@ -1,62 +1,74 @@
 package edu.mike.frontend.taskapp.presentation.ui.layout
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import edu.mike.frontend.taskapp.R
 
 /**
- * MainLayout is a composable function that sets up the main layout of the application.
+ * MainLayout is a composable that provides the standard layout structure for the application.
  *
- * This layout includes a common app bar or header and a content area that changes based on the current screen.
+ * It creates a consistent visual hierarchy with a branded header section containing the
+ * application name and subtitle, followed by the screen-specific content. This component
+ * handles proper padding and accessibility concerns while applying Material Design principles.
  *
- * @param content The composable content to display within the main layout.
+ * @param paddingValues PaddingValues to be applied to the layout, typically from Scaffold
+ * @param content The screen-specific content to be displayed within this layout
  */
 @Composable
-fun MainLayout(paddingValues: PaddingValues, content: @Composable () -> Unit) {
+fun MainLayout(
+    paddingValues: PaddingValues,
+    content: @Composable () -> Unit
+) {
     Surface(
         modifier = Modifier
             .fillMaxSize()
-            .padding(paddingValues)
+            .padding(paddingValues),
+        color = MaterialTheme.colorScheme.background
     ) {
         Column {
-            // Common app bar or header
-            val appName = stringResource(id = R.string.app_name)
-            val appTitle = stringResource(id = R.string.app_title)
+            // App header section with primary branding
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                color = MaterialTheme.colorScheme.primary
+            ) {
+                Text(
+                    text = stringResource(id = R.string.app_name),
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp, bottom = 8.dp)
+                        .semantics { heading() }
+                )
+            }
 
+            // App subtitle section
             Text(
-                text = appName,
-                fontSize = 34.sp,
-                color = Color.White,
+                text = stringResource(id = R.string.app_title),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
                 modifier = Modifier
-                    .fillMaxWidth() // Use fillMaxWidth instead of fillMaxSize
-                    .background(Color.Blue)
-                    .padding(8.dp)
-            )
-            Text(
-                text = appTitle,
-                fontSize = 20.sp,
-                color = Color.Gray,
-                modifier = Modifier
-                    .fillMaxWidth() // Use fillMaxWidth instead of fillMaxSize
-                    .padding(8.dp)
-                    .padding(bottom = 20.dp)
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .padding(bottom = 16.dp)
             )
 
-            // Spacer or any other common UI elements can be added here
-
-            // Content that changes based on the current screen
+            // Screen-specific content
             content()
         }
     }
