@@ -39,14 +39,15 @@ import edu.mike.frontend.taskapp.viewmodel.TaskViewModel
 /**
  * Main entry point of the Task Application.
  *
- * This activity demonstrates:
- * - Usage of Jetpack Compose for modern UI development
- * - Implementation of MVVM architecture pattern
- * - State management using ViewModels
- * - Proper activity lifecycle handling
+ * This activity serves as the primary UI container for the Task Application,
+ * demonstrating the implementation of a modern Android application using:
+ * - Jetpack Compose for declarative UI development
+ * - MVVM architecture pattern for separation of concerns
+ * - StateFlow for reactive state management
+ * - Material3 design system
  *
- * @see ComponentActivity
- * @see TaskViewModel
+ * @see ComponentActivity Base class for activities using Compose
+ * @see TaskViewModel Manages UI state and business logic
  */
 class MainActivity : ComponentActivity() {
     private val taskViewModel: TaskViewModel by viewModels()
@@ -63,14 +64,15 @@ class MainActivity : ComponentActivity() {
 }
 
 /**
- * Main screen composable that serves as the container for all UI elements.
+ * Main screen composable that serves as the root container for the application UI.
  *
- * This composable demonstrates:
- * - State management using StateFlow and collectAsState
- * - Implementation of Material3 Scaffold pattern
- * - Proper composition of UI components
+ * Features:
+ * - Reactive state management using StateFlow and collectAsState
+ * - Material3 Scaffold implementation for consistent layout structure
+ * - Separation of concerns with composable functions
+ * - Proper state hoisting pattern
  *
- * @param taskViewModel The ViewModel that manages the UI state
+ * @param taskViewModel ViewModel instance that manages the UI state and business logic
  */
 @Composable
 fun TaskAppScreen(taskViewModel: TaskViewModel) {
@@ -90,14 +92,15 @@ fun TaskAppScreen(taskViewModel: TaskViewModel) {
 }
 
 /**
- * Top app bar composable that displays the application title.
+ * Top app bar composable that displays the application title using Material3 design.
  *
- * Demonstrates:
- * - Material3 TopAppBar implementation
- * - Proper theming and styling
- * - Resource management using stringResource
+ * Features:
+ * - Material3 CenterAlignedTopAppBar implementation
+ * - Consistent theming with app's color scheme
+ * - Localized string resource usage
+ * - Proper typography scaling
  */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class) // ExperimentalMaterial3Api is an annotation class that marks certain Material 3 components as experimental
 @Composable
 fun TaskAppTopBar() {
     CenterAlignedTopAppBar(
@@ -115,18 +118,18 @@ fun TaskAppTopBar() {
 }
 
 /**
- * Main content composable that displays the task information and list.
+ * Main content composable that manages the task display area and list.
  *
- * Demonstrates:
- * - Composable parameter passing
- * - State handling
- * - Layout composition
- * - Modifier usage
+ * Features:
+ * - Responsive layout using Column and weight modifiers
+ * - State-based UI rendering
+ * - Proper component composition
+ * - Event handling through callbacks
  *
- * @param modifier Modifier for styling and layout
- * @param taskState Current state of the selected task
- * @param taskList List of all available tasks
- * @param onRefresh Callback for refresh action
+ * @param modifier Modifier for customizing layout and appearance
+ * @param taskState Current state of the selected task (Loading/Success/Empty)
+ * @param taskList Collection of all available tasks
+ * @param onRefresh Callback triggered when a refresh is requested
  */
 @Composable
 fun TaskAppContent(
@@ -160,16 +163,17 @@ fun TaskAppContent(
 }
 
 /**
- * Card composable that displays task details based on its state.
+ * Card composable that displays task information based on its current state.
  *
- * Demonstrates:
- * - State pattern implementation in UI
- * - Conditional rendering
- * - Material3 Card usage
+ * Features:
+ * - State-based content rendering
+ * - Interactive feedback through clicks
+ * - Material3 elevation and styling
+ * - Proper error and loading state handling
  *
- * @param modifier Modifier for styling and layout
- * @param taskState Current state of the task
- * @param onRefresh Callback for refresh action
+ * @param modifier Modifier for customizing layout and appearance
+ * @param taskState Current state of the task (Loading/Success/Empty)
+ * @param onRefresh Callback triggered when the card is clicked
  */
 @Composable
 fun TaskCard(
