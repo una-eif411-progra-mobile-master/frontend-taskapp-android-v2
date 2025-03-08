@@ -9,7 +9,15 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 /**
- * Sealed class to represent different states of the task.
+ * Sealed class representing the various states of a task operation.
+ *
+ * States:
+ * - Loading: Indicates an ongoing task fetch operation
+ * - Success: Contains the successfully retrieved task
+ * - Empty: Indicates no task is available
+ *
+ * This sealed class ensures type-safe handling of all possible task states
+ * in the UI layer through exhaustive when expressions.
  */
 sealed class TaskState {
     data object Loading : TaskState()
@@ -18,8 +26,17 @@ sealed class TaskState {
 }
 
 /**
- * ViewModel for managing UI-related data in a lifecycle-conscious way.
- * It allows data to survive configuration changes such as screen rotations.
+ * ViewModel responsible for managing task-related UI state and business logic.
+ *
+ * Features:
+ * - StateFlow for reactive state management
+ * - Coroutine integration with viewModelScope
+ * - Separation of mutable and immutable state
+ * - Random task selection functionality
+ * - Full task list management
+ *
+ * @property task Immutable StateFlow exposing the current task state
+ * @property taskList Immutable StateFlow exposing the list of all tasks
  */
 class TaskViewModel : ViewModel() {
 
@@ -32,7 +49,13 @@ class TaskViewModel : ViewModel() {
     val taskList: StateFlow<List<Task>> get() = _taskList
 
     /**
-     * Fetches a random task from the TaskProvider and updates the _task state.
+     * Fetches a random task from the TaskProvider.
+     *
+     * This function:
+     * 1. Sets the task state to Loading
+     * 2. Generates a random position (0-9)
+     * 3. Retrieves the task from the provider
+     * 4. Updates the task state with Success or Empty
      */
     fun getTask() {
         viewModelScope.launch {
@@ -44,7 +67,11 @@ class TaskViewModel : ViewModel() {
     }
 
     /**
-     * Fetches all tasks from the TaskProvider and updates the _taskList state.
+     * Retrieves all available tasks from the TaskProvider.
+     *
+     * This function:
+     * 1. Fetches the complete task list
+     * 2. Updates the taskList state with the retrieved data
      */
     fun findAllTasks() {
         viewModelScope.launch {
