@@ -1,9 +1,11 @@
 package edu.mike.frontend.taskapp.model
 
 /**
- * This class represents the Priority of a Task
+ * This class represents the Priority of a Task.
+ * @property id The unique identifier of the priority.
+ * @property label The label of the priority.
  */
 data class Priority(
-    var id: Long? = null,
-    var label: String? = null,
+    val id: Long,
+    val label: String
 )

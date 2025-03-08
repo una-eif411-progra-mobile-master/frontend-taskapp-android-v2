@@ -3,110 +3,118 @@ package edu.mike.frontend.taskapp.model
 import java.util.Date
 
 /**
- * This is a temporary class to simulate the interaction with data
- *
+ * This class simulates the interaction with data.
  */
 class TaskProvider {
     companion object {
-        fun findTaskById(id: Int): Task? {
-            return if (id in taskList.indices) taskList[id] else null
-        }
-
-        fun findAllTask(): List<Task> {
-            return taskList
-        }
-
         private val taskList = listOf(
             Task(
-                1,
-                "Different Notes",
-                "Evaluate Students",
-                Date(),
-                Date(),
-                Priority(1, "High"),
-                Status(1, "Pending")
+                id = 1,
+                title = "Different Notes",
+                notes = "Evaluate Students",
+                createdDate = Date(),
+                dueDate = Date(),
+                priority = Priority(1, "High"),
+                status = Status(1, "Pending")
             ),
             Task(
-                2,
-                "More Notes",
-                "Coordinate with professors",
-                Date(),
-                Date(),
-                Priority(1, "High"),
-                Status(1, "Pending")
+                id = 2,
+                title = "More Notes",
+                notes = "Coordinate with professors",
+                createdDate = Date(),
+                dueDate = Date(),
+                priority = Priority(1, "High"),
+                status = Status(1, "Pending")
             ),
             Task(
-                3,
-                "Other Notes 3",
-                "We can not create ViewModel on our own. We need the ViewModelProviders utility provided by Android to create ViewModels.",
-                Date(),
-                Date(),
-                Priority(1, "High"),
-                Status(1, "Pending")
+                id = 3,
+                title = "Other Notes 3",
+                notes = "We can not create ViewModel on our own. We need the ViewModelProviders utility provided by Android to create ViewModels.",
+                createdDate = Date(),
+                dueDate = Date(),
+                priority = Priority(1, "High"),
+                status = Status(1, "Pending")
             ),
             Task(
-                4,
-                "Other Notes 4",
-                "In the UI part, We need to create an instance of",
-                Date(),
-                Date(),
-                Priority(1, "High"),
-                Status(1, "Pending")
+                id = 4,
+                title = "Other Notes 4",
+                notes = "In the UI part, We need to create an instance of",
+                createdDate = Date(),
+                dueDate = Date(),
+                priority = Priority(1, "High"),
+                status = Status(1, "Pending")
             ),
             Task(
-                5,
-                "Other Notes 5",
-                "Create recyclerview in our main XML file.",
-                Date(),
-                Date(),
-                Priority(1, "High"),
-                Status(1, "Pending")
+                id = 5,
+                title = "Other Notes 5",
+                notes = "Create recyclerview in our main XML file.",
+                createdDate = Date(),
+                dueDate = Date(),
+                priority = Priority(1, "High"),
+                status = Status(1, "Pending")
             ),
             Task(
-                6,
-                "Other Notes 6",
-                "We need to create an instance of the ViewModel",
-                Date(),
-                Date(),
-                Priority(1, "High"),
-                Status(1, "Pending")
+                id = 6,
+                title = "Other Notes 6",
+                notes = "We need to create an instance of the ViewModel",
+                createdDate = Date(),
+                dueDate = Date(),
+                priority = Priority(1, "High"),
+                status = Status(1, "Pending")
             ),
             Task(
-                7,
-                "Other Notes 7",
-                "Also, create an adapter for the recyclerview",
-                Date(),
-                Date(),
-                Priority(1, "High"),
-                Status(1, "Pending")
+                id = 7,
+                title = "Other Notes 7",
+                notes = "Also, create an adapter for the recyclerview",
+                createdDate = Date(),
+                dueDate = Date(),
+                priority = Priority(1, "High"),
+                status = Status(1, "Pending")
             ),
             Task(
-                8,
-                "Other Notes 8",
-                "Retrofit is a “Type-safe HTTP client for Android and Java”.",
-                Date(),
-                Date(),
-                Priority(1, "High"),
-                Status(1, "Pending")
+                id = 8,
+                title = "Other Notes 8",
+                notes = "Retrofit is a “Type-safe HTTP client for Android and Java”.",
+                createdDate = Date(),
+                dueDate = Date(),
+                priority = Priority(1, "High"),
+                status = Status(1, "Pending")
             ),
             Task(
-                9,
-                "Other Notes 9",
-                "Both are part of the same class. RetrofitService.kt",
-                Date(),
-                Date(),
-                Priority(1, "High"),
-                Status(1, "Pending")
+                id = 9,
+                title = "Other Notes 9",
+                notes = "Both are part of the same class. RetrofitService.kt",
+                createdDate = Date(),
+                dueDate = Date(),
+                priority = Priority(1, "High"),
+                status = Status(1, "Pending")
             ),
             Task(
-                10,
-                "Other Notes 10",
-                "Create the Retrofit service instance using the retrofit.",
-                Date(),
-                Date(),
-                Priority(1, "High"),
-                Status(1, "Pending")
+                id = 10,
+                title = "Other Notes 10",
+                notes = "Create the Retrofit service instance using the retrofit.",
+                createdDate = Date(),
+                dueDate = Date(),
+                priority = Priority(1, "High"),
+                status = Status(1, "Pending")
             )
         )
+
+        /**
+         * Finds a task by its ID.
+         * @param id The ID of the task to find.
+         * @return The task with the given ID, or null if not found.
+         */
+        fun findTaskById(id: Int): Task? {
+            return taskList.getOrNull(id)
+        }
+
+        /**
+         * Finds all tasks.
+         * @return A list of all tasks.
+         */
+        fun findAllTasks(): List<Task> {
+            return taskList
+        }
     }
 }
