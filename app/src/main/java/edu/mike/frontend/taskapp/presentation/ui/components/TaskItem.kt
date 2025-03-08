@@ -25,49 +25,42 @@ import java.util.Locale
  */
 @Composable
 fun TaskItem(task: Task, onClick: (Task) -> Unit) {
-    // Format the dates for display using SimpleDateFormat
     val dateFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-    val createDate = dateFormatter.format(task.createDate)
+    val createdDate = dateFormatter.format(task.createdDate)
     val dueDate = dateFormatter.format(task.dueDate)
 
-    // Column is used to vertically arrange the task details
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
             .background(Color.LightGray)
             .padding(8.dp)
-            .clickable { onClick(task) }  // Make the task clickable
+            .clickable { onClick(task) }
     ) {
-        // Display the task title
         Text(
             text = "Title: ${task.title}",
             fontSize = 20.sp,
             color = Color.Black,
-            modifier = Modifier.padding(bottom = 4.dp)  // Add padding below the title
+            modifier = Modifier.padding(bottom = 4.dp)
         )
-        // Display the task notes
         Text(
             text = "Notes: ${task.notes}",
             fontSize = 16.sp,
             color = Color.Gray,
             modifier = Modifier.padding(bottom = 8.dp)
         )
-        // Display the task's creation date
         Text(
-            text = "Created On: $createDate",
+            text = "Created On: $createdDate",
             fontSize = 14.sp,
             color = Color.DarkGray,
             modifier = Modifier.padding(bottom = 4.dp)
         )
-        // Display the task's due date
         Text(
             text = "Due On: $dueDate",
             fontSize = 14.sp,
             color = Color.DarkGray,
             modifier = Modifier.padding(bottom = 4.dp)
         )
-        // Display the task's priority and status
         Text(
             text = "Priority: ${task.priority.label}",
             fontSize = 14.sp,

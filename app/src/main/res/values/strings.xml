@@ -1,4 +1,7 @@
 <resources>
-    <string name="app_name">TaskApp</string>
+    <string name="app_name">Task App</string>
     <string name="app_title">MVVM Simple Sample</string>
+    <string name="task_title">Title:</string>
+    <string name="task_notes">Notes:</string>
+    <string name="no_task_available">No task available</string>
 </resources>

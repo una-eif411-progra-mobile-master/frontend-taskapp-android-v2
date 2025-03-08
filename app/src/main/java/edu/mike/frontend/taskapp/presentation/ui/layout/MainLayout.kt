@@ -2,6 +2,7 @@ package edu.mike.frontend.taskapp.presentation.ui.layout
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -23,11 +24,11 @@ import edu.mike.frontend.taskapp.R
  * @param content The composable content to display within the main layout.
  */
 @Composable
-fun MainLayout(content: @Composable () -> Unit) {
+fun MainLayout(paddingValues: PaddingValues, content: @Composable () -> Unit) {
     Surface(
         modifier = Modifier
             .fillMaxSize()
-            .padding(0.dp)
+            .padding(paddingValues)
     ) {
         Column {
             // Common app bar or header

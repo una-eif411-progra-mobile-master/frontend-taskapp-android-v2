@@ -1,6 +1,7 @@
 package edu.mike.frontend.taskapp.presentation.ui.screens
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
@@ -14,7 +15,7 @@ import androidx.navigation.NavController
 import edu.mike.frontend.taskapp.presentation.ui.layout.MainLayout
 import edu.mike.frontend.taskapp.presentation.viewmodel.TaskViewModel
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Locale
 
 /**
  * TaskDetailScreen is a composable function that displays the details of a specific task.
@@ -27,25 +28,58 @@ import java.util.*
  * @param navController The NavController used for navigation between screens.
  */
 @Composable
-fun TaskDetailScreen(taskId: Int, taskViewModel: TaskViewModel, navController: NavController) {
+fun TaskDetailScreen(
+    taskId: Long,
+    taskViewModel: TaskViewModel,
+    navController: NavController,
+    paddingValues: PaddingValues
+) {
     taskViewModel.selectTaskById(taskId)
     val task = taskViewModel.selectedTask.collectAsState().value
     val dateFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
-    MainLayout {
+    MainLayout(paddingValues = paddingValues) {
         task?.let {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(16.dp)
             ) {
-                Text(text = "Task Details", fontSize = 24.sp, modifier = Modifier.padding(bottom = 16.dp))
-                Text(text = "Title: ${task.title}", fontSize = 20.sp, modifier = Modifier.padding(bottom = 8.dp))
-                Text(text = "Notes: ${task.notes}", fontSize = 16.sp, modifier = Modifier.padding(bottom = 8.dp))
-                Text(text = "Created On: ${dateFormatter.format(task.createDate)}", fontSize = 14.sp, modifier = Modifier.padding(bottom = 4.dp))
-                Text(text = "Due On: ${dateFormatter.format(task.dueDate)}", fontSize = 14.sp, modifier = Modifier.padding(bottom = 4.dp))
-                Text(text = "Priority: ${task.priority.label}", fontSize = 14.sp, modifier = Modifier.padding(bottom = 4.dp))
-                Text(text = "Status: ${task.status.label}", fontSize = 14.sp, modifier = Modifier.padding(bottom = 4.dp))
+                Text(
+                    text = "Task Details",
+                    fontSize = 24.sp,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+                Text(
+                    text = "Title: ${task.title}",
+                    fontSize = 20.sp,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                Text(
+                    text = "Notes: ${task.notes}",
+                    fontSize = 16.sp,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                Text(
+                    text = "Created On: ${dateFormatter.format(task.createdDate)}",
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+                Text(
+                    text = "Due On: ${dateFormatter.format(task.dueDate)}",
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+                Text(
+                    text = "Priority: ${task.priority.label}",
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+                Text(
+                    text = "Status: ${task.status.label}",
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
 
                 // Button to go back to the task list
                 Button(
