@@ -1,5 +1,6 @@
 package edu.mike.frontend.taskapp.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import edu.mike.frontend.taskapp.model.Task
@@ -76,6 +77,7 @@ class TaskViewModel : ViewModel() {
     fun findAllTasks() {
         viewModelScope.launch {
             val taskList = TaskProvider.findAllTasks()
+            Log.d("TaskViewModel", "Total Tasks: ${taskList.size}")
             _taskList.value = taskList
         }
     }
