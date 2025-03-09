@@ -30,11 +30,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import edu.mike.frontend.taskapp.model.Priority
+import edu.mike.frontend.taskapp.model.Status
 import edu.mike.frontend.taskapp.model.Task
 import edu.mike.frontend.taskapp.ui.theme.TaskAppTheme
 import edu.mike.frontend.taskapp.viewmodel.TaskState
 import edu.mike.frontend.taskapp.viewmodel.TaskViewModel
+import java.util.Date
+
 
 /**
  * Main entry point of the Task Application.
@@ -195,6 +200,12 @@ fun TaskCard(
     }
 }
 
+/**
+ * Displays a loading indicator when task data is being fetched.
+ *
+ * This composable shows a centered circular progress indicator to provide
+ * visual feedback during task loading operations.
+ */
 @Composable
 fun TaskLoadingContent() {
     Box(
@@ -207,6 +218,16 @@ fun TaskLoadingContent() {
     }
 }
 
+/**
+ * Displays the content of a successfully loaded task.
+ *
+ * Features:
+ * - Structured layout with title and notes
+ * - Consistent typography styling
+ * - Proper spacing between elements
+ *
+ * @param task The task object containing data to display
+ */
 @Composable
 fun TaskSuccessContent(task: Task) {
     Column(modifier = Modifier.padding(16.dp)) {
@@ -222,6 +243,12 @@ fun TaskSuccessContent(task: Task) {
     }
 }
 
+/**
+ * Displays a message when no task is available.
+ *
+ * This composable shows a user-friendly message when the task state is empty,
+ * providing clear feedback about the absence of task data.
+ */
 @Composable
 fun TaskEmptyContent() {
     Text(
@@ -231,6 +258,17 @@ fun TaskEmptyContent() {
     )
 }
 
+/**
+ * Displays a scrollable list of tasks.
+ *
+ * Features:
+ * - Lazy loading for performance optimization
+ * - Consistent spacing between list items
+ * - Proper layout structuring
+ *
+ * @param tasks Collection of tasks to display in the list
+ * @param modifier Modifier for customizing layout and appearance
+ */
 @Composable
 fun TaskList(
     tasks: List<Task>,
@@ -246,6 +284,16 @@ fun TaskList(
     }
 }
 
+/**
+ * Displays an individual task item in the task list.
+ *
+ * Features:
+ * - Material card design with proper elevation
+ * - Structured layout with title and notes
+ * - Consistent typography and spacing
+ *
+ * @param task The task object containing data to display
+ */
 @Composable
 fun TaskListItem(task: Task) {
     Card(
@@ -269,5 +317,111 @@ fun TaskListItem(task: Task) {
                 style = MaterialTheme.typography.bodyMedium
             )
         }
+    }
+}
+
+/**
+ * Preview composable for the TaskCard component.
+ *
+ * Demonstrates how a task card appears with sample data in the Success state.
+ * Shows formatting for task title, notes, with High priority and In Progress status.
+ */
+@Preview(showBackground = true)
+@Composable
+fun TaskCardPreview() {
+    TaskAppTheme {
+        TaskCard(
+            taskState = TaskState.Success(
+                Task(
+                    id = 1L,
+                    title = "Complete the app design",
+                    notes = "Focus on creating a clean and intuitive user interface",
+                    priority = Priority(1L, "High"),
+                    status = Status(2L, "In Progress"),
+                    createdDate = Date(),
+                    dueDate = Date(System.currentTimeMillis() + 86400000) // one day later
+                )
+            ),
+            onRefresh = {}
+        )
+    }
+}
+
+/**
+ * Preview composable for the TaskListItem component.
+ *
+ * Shows how an individual task appears within the task list.
+ * Demonstrates formatting for a Medium priority, Pending status task.
+ */
+@Preview(showBackground = true)
+@Composable
+fun TaskListItemPreview() {
+    TaskAppTheme {
+        TaskListItem(
+            task = Task(
+                id = 2L,
+                title = "Research API integration",
+                notes = "Look for best practices in RESTful API consumption",
+                priority = Priority(2L, "Medium"),
+                status = Status(1L, "Pending"),
+                createdDate = Date(),
+                dueDate = Date(System.currentTimeMillis() + 172800000) // two days later
+            )
+        )
+    }
+}
+
+/**
+ * Preview composable for the complete TaskAppContent layout.
+ *
+ * Demonstrates the full application content area with:
+ * - A featured task in Success state
+ * - A list of sample tasks with varied priorities and statuses
+ * - Realistic date handling with created and due dates
+ *
+ * This preview uses a fixed width of 320dp to simulate a common device width.
+ */
+@Preview(showBackground = true, widthDp = 320)
+@Composable
+fun TaskAppContentPreview() {
+    val now = Date()
+    val future1 = Date(now.time + 259200000) // three days later
+    val future2 = Date(now.time + 432000000) // five days later
+
+    TaskAppTheme {
+        TaskAppContent(
+            taskState = TaskState.Success(
+                Task(
+                    id = 3L,
+                    title = "Write unit tests",
+                    notes = "Ensure code coverage for all critical components",
+                    priority = Priority(1L, "High"),
+                    status = Status(2L, "In Progress"),
+                    createdDate = now,
+                    dueDate = future1
+                )
+            ),
+            taskList = listOf(
+                Task(
+                    id = 3L,
+                    title = "Write unit tests",
+                    notes = "Ensure code coverage for all critical components",
+                    priority = Priority(1L, "High"),
+                    status = Status(2L, "In Progress"),
+                    createdDate = now,
+                    dueDate = future1
+                ),
+                Task(
+                    id = 4L,
+                    title = "Implement dark mode",
+                    notes = "Add support for light/dark theme switching",
+                    priority = Priority(3L, "Low"),
+                    status = Status(1L, "Pending"),
+                    createdDate = now,
+                    dueDate = future2
+                )
+            ),
+            onRefresh = {}
+        )
     }
 }
