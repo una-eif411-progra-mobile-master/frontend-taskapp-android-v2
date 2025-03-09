@@ -1,6 +1,7 @@
 package edu.mike.frontend.taskapp
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -25,8 +26,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -59,7 +65,6 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        taskViewModel.findAllTasks()
         setContent {
             TaskAppTheme {
                 TaskAppScreen(taskViewModel)
@@ -83,6 +88,10 @@ class MainActivity : ComponentActivity() {
 fun TaskAppScreen(taskViewModel: TaskViewModel) {
     val task by taskViewModel.task.collectAsState()
     val taskList by taskViewModel.taskList.collectAsState()
+
+    LaunchedEffect(Unit) {
+        taskViewModel.findAllTasks()
+    }
 
     Scaffold(
         topBar = { TaskAppTopBar() }
@@ -143,6 +152,11 @@ fun TaskAppContent(
     taskList: List<Task>,
     onRefresh: () -> Unit
 ) {
+
+    SideEffect {
+        Log.d("TaskApp", "El estado de las tareas ha cambiado: $taskState")
+    }
+
     Column(modifier = modifier.fillMaxSize()) {
         Text(
             text = stringResource(id = R.string.app_title),
@@ -295,11 +309,12 @@ fun TaskList(
  * @param task The task object containing data to display
  */
 @Composable
-fun TaskListItem(task: Task) {
+fun TaskListItem(task: Task, onClick: () -> Unit = {}) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = 16.dp)
+            .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         )
@@ -315,6 +330,36 @@ fun TaskListItem(task: Task) {
             Text(
                 text = task.notes,
                 style = MaterialTheme.typography.bodyMedium
+            )
+        }
+    }
+}
+
+
+/**
+ * Composable function that displays a list of tasks for selection.
+ *
+ * Features:
+ * - LazyColumn for optimized list rendering
+ * - TaskListItem composable for individual task display
+ * - Proper state management for selected task
+ *
+ * @param taskList List of tasks to display
+ * @param onTaskSelected Callback triggered when a task is selected
+ */
+@Composable
+fun TaskSelectionScreen(taskList: List<Task>, onTaskSelected: (Task) -> Unit = {}) {
+    var selectedTaskId by rememberSaveable { mutableStateOf<Long?>(null) }
+
+    LazyColumn {
+        items(taskList) { task ->
+            TaskListItem(
+                task = task,
+                onClick = {
+                    selectedTaskId = task.id
+                    onTaskSelected(task)
+                    Log.d("TaskApp", "Task selected: ${task.title} id: $selectedTaskId")
+                }
             )
         }
     }
