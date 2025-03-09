@@ -16,6 +16,7 @@ import kotlinx.coroutines.launch
  * - Loading: Indicates an ongoing task fetch operation
  * - Success: Contains the successfully retrieved task
  * - Empty: Indicates no task is available
+ * - Error: Contains an error message if the task fetch operation fails
  *
  * This sealed class ensures type-safe handling of all possible task states
  * in the UI layer through exhaustive when expressions.
@@ -24,6 +25,7 @@ sealed class TaskState {
     data object Loading : TaskState()
     data class Success(val task: Task) : TaskState()
     data object Empty : TaskState()
+    data class Error(val message: String) : TaskState()
 }
 
 /**
@@ -54,16 +56,25 @@ class TaskViewModel : ViewModel() {
      *
      * This function:
      * 1. Sets the task state to Loading
-     * 2. Generates a random position (0-9)
+     * 2. Generates a random position based on the task list size
      * 3. Retrieves the task from the provider
-     * 4. Updates the task state with Success or Empty
+     * 4. Updates the task state with Success, Empty, or Error
      */
     fun getTask() {
         viewModelScope.launch {
             _task.value = TaskState.Loading
-            val position = (0..9).random()
-            val task = TaskProvider.findTaskById(position)
-            _task.value = task?.let { TaskState.Success(it) } ?: TaskState.Empty
+            try {
+                val taskList = TaskProvider.findAllTasks()
+                if (taskList.isNotEmpty()) {
+                    val position = (taskList.indices).random()
+                    val task = taskList[position]
+                    _task.value = TaskState.Success(task)
+                } else {
+                    _task.value = TaskState.Empty
+                }
+            } catch (e: Exception) {
+                _task.value = TaskState.Error("Failed to fetch task: ${e.message}")
+            }
         }
     }
 
@@ -76,9 +87,13 @@ class TaskViewModel : ViewModel() {
      */
     fun findAllTasks() {
         viewModelScope.launch {
-            val taskList = TaskProvider.findAllTasks()
-            Log.d("TaskViewModel", "Total Tasks: ${taskList.size}")
-            _taskList.value = taskList
+            try {
+                val taskList = TaskProvider.findAllTasks()
+                Log.d("TaskViewModel", "Total Tasks: ${taskList.size}")
+                _taskList.value = taskList
+            } catch (e: Exception) {
+                Log.e("TaskViewModel", "Failed to fetch tasks: ${e.message}")
+            }
         }
     }
 }

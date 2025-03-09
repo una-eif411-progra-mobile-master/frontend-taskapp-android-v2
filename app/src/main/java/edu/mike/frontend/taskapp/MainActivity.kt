@@ -203,15 +203,33 @@ fun TaskCard(
     Card(
         modifier = modifier.clickable(onClick = onRefresh),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = MaterialTheme.colorScheme.primary
         )
     ) {
         when (taskState) {
             is TaskState.Loading -> TaskLoadingContent()
             is TaskState.Success -> TaskSuccessContent(task = taskState.task)
             is TaskState.Empty -> TaskEmptyContent()
+            is TaskState.Error -> TaskErrorContent(message = taskState.message)
         }
     }
+}
+
+/**
+ * Displays an error message when task data fetching fails.
+ *
+ * This composable shows a user-friendly error message to provide
+ * feedback about the failure of task loading operations.
+ *
+ * @param message The error message to display
+ */
+@Composable
+fun TaskErrorContent(message: String) {
+    Text(
+        text = stringResource(id = R.string.error_message, message),
+        style = MaterialTheme.typography.bodyLarge,
+        modifier = Modifier.padding(16.dp)
+    )
 }
 
 /**
@@ -266,7 +284,7 @@ fun TaskSuccessContent(task: Task) {
 @Composable
 fun TaskEmptyContent() {
     Text(
-        text = "No task available",
+        text = stringResource(id = R.string.no_task_available),
         style = MaterialTheme.typography.bodyLarge,
         modifier = Modifier.padding(16.dp)
     )
@@ -335,7 +353,6 @@ fun TaskListItem(task: Task, onClick: () -> Unit = {}) {
     }
 }
 
-
 /**
  * Composable function that displays a list of tasks for selection.
  *
@@ -379,8 +396,8 @@ fun TaskCardPreview() {
             taskState = TaskState.Success(
                 Task(
                     id = 1L,
-                    title = "Complete the app design",
-                    notes = "Focus on creating a clean and intuitive user interface",
+                    title = "Task Card Preview",
+                    notes = "Click here to change with a random tasks",
                     priority = Priority(1L, "High"),
                     status = Status(2L, "In Progress"),
                     createdDate = Date(),
@@ -438,8 +455,8 @@ fun TaskAppContentPreview() {
             taskState = TaskState.Success(
                 Task(
                     id = 3L,
-                    title = "Write unit tests",
-                    notes = "Ensure code coverage for all critical components",
+                    title = "Task Card Preview",
+                    notes = "Click here to change with a random tasks",
                     priority = Priority(1L, "High"),
                     status = Status(2L, "In Progress"),
                     createdDate = now,
