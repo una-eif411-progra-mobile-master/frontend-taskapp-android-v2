@@ -30,9 +30,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -348,35 +345,6 @@ fun TaskListItem(task: Task, onClick: () -> Unit = {}) {
             Text(
                 text = task.notes,
                 style = MaterialTheme.typography.bodyMedium
-            )
-        }
-    }
-}
-
-/**
- * Composable function that displays a list of tasks for selection.
- *
- * Features:
- * - LazyColumn for optimized list rendering
- * - TaskListItem composable for individual task display
- * - Proper state management for selected task
- *
- * @param taskList List of tasks to display
- * @param onTaskSelected Callback triggered when a task is selected
- */
-@Composable
-fun TaskSelectionScreen(taskList: List<Task>, onTaskSelected: (Task) -> Unit = {}) {
-    var selectedTaskId by rememberSaveable { mutableStateOf<Long?>(null) }
-
-    LazyColumn {
-        items(taskList) { task ->
-            TaskListItem(
-                task = task,
-                onClick = {
-                    selectedTaskId = task.id
-                    onTaskSelected(task)
-                    Log.d("TaskApp", "Task selected: ${task.title} id: $selectedTaskId")
-                }
             )
         }
     }
