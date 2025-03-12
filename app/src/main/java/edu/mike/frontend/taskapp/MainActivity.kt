@@ -117,7 +117,7 @@ fun TaskContent(taskState: TaskState) {
         when (taskState) {
             is TaskState.Loading -> {
                 Text(
-                    text = "Loading...",
+                    text = stringResource(id = R.string.loading),
                     fontSize = 20.sp,
                     modifier = Modifier.fillMaxWidth()
                 )
