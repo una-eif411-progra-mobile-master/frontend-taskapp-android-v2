@@ -1,4 +1,4 @@
-package edu.mike.frontend.taskapp.data.model
+package edu.mike.frontend.taskapp.domain.model
 
 import java.util.Date
 

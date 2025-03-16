@@ -3,5 +3,7 @@
     <string name="app_title">MVVM Simple Sample</string>
     <string name="task_title">Title:</string>
     <string name="task_notes">Notes:</string>
-    <string name="no_task_available">No task available</string>
+    <string name="no_task_available">No task available - Click to refresh</string>
+    <string name="error_message">Error: %1$s</string>
+    <string name="no_tasks_available">No tasks available</string>
 </resources>

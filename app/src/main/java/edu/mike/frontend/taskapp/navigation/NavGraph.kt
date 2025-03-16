@@ -9,7 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import edu.mike.frontend.taskapp.presentation.ui.screens.TaskDetailScreen
 import edu.mike.frontend.taskapp.presentation.ui.screens.TaskListScreen
-import edu.mike.frontend.taskapp.presentation.viewmodel.TaskViewModel
+import edu.mike.frontend.taskapp.viewmodel.TaskViewModel
 
 /**
  * Sets up the navigation graph for the application.

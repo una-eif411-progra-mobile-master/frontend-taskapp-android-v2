@@ -1,4 +1,4 @@
-package edu.mike.frontend.taskapp.data.model
+package edu.mike.frontend.taskapp.domain.model
 
 /**
  * This class represents the Status of a Task.

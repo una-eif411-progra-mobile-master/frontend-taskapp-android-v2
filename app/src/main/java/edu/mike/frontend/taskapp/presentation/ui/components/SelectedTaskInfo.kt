@@ -15,7 +15,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import edu.mike.frontend.taskapp.data.model.Task
+import edu.mike.frontend.taskapp.domain.model.Task
 
 /**
  * A component that displays detailed information about a selected task.
