@@ -12,6 +12,9 @@ import org.junit.Test
 import java.text.SimpleDateFormat
 import java.util.Locale
 
+/**
+ * Unit tests for the TaskMapper class.
+ */
 class TaskMapperTest {
 
     private lateinit var taskMapper: TaskMapper
@@ -19,6 +22,9 @@ class TaskMapperTest {
     private lateinit var statusMapper: StatusMapper
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
+    /**
+     * Sets up the test environment before each test.
+     */
     @Before
     fun setUp() {
         priorityMapper = PriorityMapper()
@@ -26,6 +32,9 @@ class TaskMapperTest {
         taskMapper = TaskMapper(priorityMapper, statusMapper)
     }
 
+    /**
+     * Tests the mapToDomain function to ensure it correctly maps a TaskDto to a Task.
+     */
     @Test
     fun `mapToDomain should map TaskDto to Task`() {
         val taskDto = TaskDto(
@@ -51,6 +60,9 @@ class TaskMapperTest {
         assertEquals(taskDto.status.label, task.status.label)
     }
 
+    /**
+     * Tests the mapToDto function to ensure it correctly maps a Task to a TaskDto.
+     */
     @Test
     fun `mapToDto should map Task to TaskDto`() {
         val task = Task(
