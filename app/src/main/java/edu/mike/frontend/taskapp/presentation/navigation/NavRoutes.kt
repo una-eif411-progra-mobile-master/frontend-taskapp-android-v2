@@ -1,4 +1,4 @@
-package edu.mike.frontend.taskapp.navigation
+package edu.mike.frontend.taskapp.presentation.navigation
 
 /**
  * Contains all navigation route constants for the application.

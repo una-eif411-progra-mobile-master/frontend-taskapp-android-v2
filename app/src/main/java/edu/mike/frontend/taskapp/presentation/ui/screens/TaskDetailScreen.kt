@@ -26,28 +26,20 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import edu.mike.frontend.taskapp.domain.model.Task
 import edu.mike.frontend.taskapp.presentation.ui.components.TaskMetadata
-import edu.mike.frontend.taskapp.viewmodel.TaskViewModel
+import edu.mike.frontend.taskapp.presentation.viewmodel.TaskViewModel
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 /**
- * TaskDetailScreen is a composable function that displays the details of a specific task.
+ * Displays detailed information about a specific task.
  *
- * This screen retrieves a task based on the provided taskId and presents all its details in a
- * structured format using Material Design components. It handles both the successful task retrieval
- * and error states when a task is not found.
+ * This screen observes the TaskViewModel's state to display task details or error states.
+ * It implements proper state handling and error management through the repository pattern.
  *
- * Key Jetpack Compose concepts demonstrated:
- * - State observation with collectAsState
- * - Conditional UI rendering based on data presence
- * - Material 3 component usage (Card, Button, etc.)
- * - Accessibility features through semantics
- * - Side effects handling with LaunchedEffect
- *
- * @param taskId The unique identifier of the task to display, retrieved from navigation parameters
- * @param taskViewModel The ViewModel that provides access to task data and business logic
- * @param navController Navigation controller used to handle screen transitions
- * @param paddingValues Padding values typically provided by a Scaffold, applied to the overall layout
+ * @param taskId The unique identifier of the task to display
+ * @param taskViewModel The ViewModel that manages task data and state
+ * @param navController Navigation controller for screen transitions
+ * @param paddingValues Padding values from the parent Scaffold
  */
 @Composable
 fun TaskDetailScreen(
@@ -56,49 +48,38 @@ fun TaskDetailScreen(
     navController: NavController,
     paddingValues: PaddingValues
 ) {
-    // Use LaunchedEffect to fetch the task when the screen is first composed
-    // or when taskId changes, preventing unnecessary reloads
     LaunchedEffect(taskId) {
         taskViewModel.selectTaskById(taskId)
     }
 
-    val task by taskViewModel.selectedTask.collectAsState()
+    val selectedTask by taskViewModel.selectedTask.collectAsState()
     val dateFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
-    // Apply paddingValues directly to content
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(paddingValues)
     ) {
-        task?.let {
+        selectedTask?.let {
             TaskDetailContent(
                 task = it,
                 dateFormatter = dateFormatter,
-                onBackClick = { navController.navigateUp() }
-            )
+                onBackClick = { navController.navigateUp() })
         } ?: TaskNotFoundContent(
-            onBackClick = { navController.navigateUp() }
-        )
+            onBackClick = { navController.navigateUp() })
     }
 }
 
 /**
- * Displays detailed information about a task in a card layout.
+ * Displays the task details in a structured card layout.
  *
- * This composable is responsible for organizing and presenting all the details
- * of a task in a structured and visually appealing manner. It uses Material Design
- * components and follows accessibility best practices.
- *
- * @param task The task object containing all the relevant details to display
- * @param dateFormatter Formatter to convert Date objects to readable strings
- * @param onBackClick Callback to handle navigation back to the task list
+ * @param task The task to display
+ * @param dateFormatter Formatter for displaying dates
+ * @param onBackClick Callback for navigation
  */
 @Composable
 private fun TaskDetailContent(
-    task: Task,
-    dateFormatter: SimpleDateFormat,
-    onBackClick: () -> Unit
+    task: Task, dateFormatter: SimpleDateFormat, onBackClick: () -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -115,17 +96,14 @@ private fun TaskDetailContent(
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            // Header section
             Text(
                 text = "Task Details",
                 style = MaterialTheme.typography.headlineMedium,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier
                     .padding(bottom = 16.dp)
-                    .semantics { heading() }
-            )
+                    .semantics { heading() })
 
-            // Task title
             Text(
                 text = task.title,
                 style = MaterialTheme.typography.titleLarge,
@@ -133,7 +111,6 @@ private fun TaskDetailContent(
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
-            // Optional task notes
             if (task.notes.isNotBlank()) {
                 Text(
                     text = task.notes,
@@ -145,67 +122,74 @@ private fun TaskDetailContent(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Task metadata section
-            Text(
-                text = "Task Information",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-
-            // Metadata fields using the reusable TaskMetadata component
-            TaskMetadata(
-                label = "Created On:",
-                value = dateFormatter.format(task.createdDate),
-                modifier = Modifier.padding(bottom = 4.dp)
-            )
-
-            TaskMetadata(
-                label = "Due On:",
-                value = dateFormatter.format(task.dueDate),
-                modifier = Modifier.padding(bottom = 4.dp)
-            )
-
-            TaskMetadata(
-                label = "Priority:",
-                value = task.priority.label,
-                modifier = Modifier.padding(bottom = 4.dp)
-            )
-
-            TaskMetadata(
-                label = "Status:",
-                value = task.status.label,
-                modifier = Modifier.padding(bottom = 4.dp)
-            )
+            TaskMetadataSection(task, dateFormatter)
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // Back button with icon
-            Button(
-                onClick = onBackClick,
-                modifier = Modifier.padding(top = 16.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back"
-                )
-                Text(
-                    text = "Back to Task List",
-                    modifier = Modifier.padding(start = 8.dp)
-                )
-            }
+            BackButton(onBackClick)
         }
     }
 }
 
 /**
- * Displays an error message when the requested task cannot be found.
+ * Displays task metadata information.
  *
- * This composable provides feedback to the user when a task ID is invalid or
- * the task has been deleted. It uses the error-themed colors from the Material theme
- * to visually indicate an error state.
+ * @param task The task containing the metadata
+ * @param dateFormatter Formatter for displaying dates
+ */
+@Composable
+private fun TaskMetadataSection(task: Task, dateFormatter: SimpleDateFormat) {
+    Text(
+        text = "Task Information",
+        style = MaterialTheme.typography.titleMedium,
+        color = MaterialTheme.colorScheme.onSurface,
+        modifier = Modifier.padding(bottom = 8.dp)
+    )
+
+    TaskMetadata(
+        label = "Created On:",
+        value = dateFormatter.format(task.createdDate),
+        modifier = Modifier.padding(bottom = 4.dp)
+    )
+
+    TaskMetadata(
+        label = "Due On:",
+        value = dateFormatter.format(task.dueDate),
+        modifier = Modifier.padding(bottom = 4.dp)
+    )
+
+    TaskMetadata(
+        label = "Priority:", value = task.priority.label, modifier = Modifier.padding(bottom = 4.dp)
+    )
+
+    TaskMetadata(
+        label = "Status:", value = task.status.label, modifier = Modifier.padding(bottom = 4.dp)
+    )
+}
+
+/**
+ * Back button component with icon.
  *
- * @param onBackClick Callback to handle navigation back to the task list
+ * @param onBackClick Callback for navigation
+ */
+@Composable
+private fun BackButton(onBackClick: () -> Unit) {
+    Button(
+        onClick = onBackClick, modifier = Modifier.padding(top = 16.dp)
+    ) {
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back"
+        )
+        Text(
+            text = "Back to Task List", modifier = Modifier.padding(start = 8.dp)
+        )
+    }
+}
+
+/**
+ * Error content when task is not found.
+ *
+ * @param onBackClick Callback for navigation
  */
 @Composable
 private fun TaskNotFoundContent(onBackClick: () -> Unit) {
@@ -233,8 +217,7 @@ private fun TaskNotFoundContent(onBackClick: () -> Unit) {
             )
 
             Button(
-                onClick = onBackClick,
-                modifier = Modifier.padding(top = 16.dp)
+                onClick = onBackClick, modifier = Modifier.padding(top = 16.dp)
             ) {
                 Text(text = "Go Back")
             }

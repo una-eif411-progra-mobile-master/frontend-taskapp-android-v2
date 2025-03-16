@@ -1,12 +1,13 @@
-package edu.mike.frontend.taskapp.viewmodel
+package edu.mike.frontend.taskapp.presentation.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import edu.mike.frontend.taskapp.data.datasource.TaskProvider
 import edu.mike.frontend.taskapp.domain.model.Task
+import edu.mike.frontend.taskapp.domain.repository.TaskRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 /**
@@ -41,18 +42,18 @@ sealed class TaskState {
  * @property task Immutable StateFlow exposing the current task state
  * @property selectedTask Immutable StateFlow exposing the currently selected task
  * @property taskList Immutable StateFlow exposing the list of all tasks
+ * @property repository Repository interface for task operations
  */
-class TaskViewModel : ViewModel() {
+class TaskViewModel(
+    private val repository: TaskRepository
+) : ViewModel() {
 
-    // Current task state
     private val _task = MutableStateFlow<TaskState>(TaskState.Empty)
     val task: StateFlow<TaskState> get() = _task
 
-    // State of the task selected by ID
     private val _selectedTask = MutableStateFlow<Task?>(null)
     val selectedTask: StateFlow<Task?> get() = _selectedTask
 
-    // State of the task list
     private val _taskList = MutableStateFlow<List<Task>>(emptyList())
     val taskList: StateFlow<List<Task>> get() = _taskList
 
@@ -68,7 +69,7 @@ class TaskViewModel : ViewModel() {
         viewModelScope.launch {
             _task.value = TaskState.Loading
             try {
-                val taskList = TaskProvider.findAllTasks()
+                val taskList = repository.getTasks().first()
                 if (taskList.isNotEmpty()) {
                     val position = (taskList.indices).random()
                     val task = taskList[position]
@@ -86,12 +87,13 @@ class TaskViewModel : ViewModel() {
     /**
      * Finds a task by its ID and stores it in `selectedTask`.
      *
+     * @param taskId The ID of the task to find
      * If the task doesn't exist, keeps `selectedTask` as `null`.
      */
     fun selectTaskById(taskId: Long) {
         viewModelScope.launch {
             try {
-                val task = TaskProvider.findTaskById(taskId)
+                val task = repository.getTaskById(taskId)
                 _selectedTask.value = task
             } catch (e: Exception) {
                 Log.e("TaskViewModel", "Error fetching task by ID: ${e.message}")
@@ -100,14 +102,16 @@ class TaskViewModel : ViewModel() {
     }
 
     /**
-     * Retrieves all available tasks and updates the list.
+     * Retrieves all available tasks and continuously updates the list.
+     * Uses Flow to observe changes in the task list.
      */
     fun findAllTasks() {
         viewModelScope.launch {
             try {
-                val taskList = TaskProvider.findAllTasks()
-                Log.d("TaskViewModel", "Total Tasks: ${taskList.size}")
-                _taskList.value = taskList
+                repository.getTasks().collect { tasks ->
+                    Log.d("TaskViewModel", "Total Tasks: ${tasks.size}")
+                    _taskList.value = tasks
+                }
             } catch (e: Exception) {
                 Log.e("TaskViewModel", "Failed to fetch tasks: ${e.message}")
             }

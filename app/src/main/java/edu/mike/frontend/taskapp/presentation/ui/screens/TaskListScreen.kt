@@ -13,6 +13,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -28,9 +29,10 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import edu.mike.frontend.taskapp.R
 import edu.mike.frontend.taskapp.domain.model.Task
+import edu.mike.frontend.taskapp.presentation.navigation.NavRoutes
 import edu.mike.frontend.taskapp.presentation.ui.components.TaskItem
-import edu.mike.frontend.taskapp.viewmodel.TaskState
-import edu.mike.frontend.taskapp.viewmodel.TaskViewModel
+import edu.mike.frontend.taskapp.presentation.viewmodel.TaskState
+import edu.mike.frontend.taskapp.presentation.viewmodel.TaskViewModel
 
 /**
  * TaskListScreen is a composable function that displays the list of available tasks.
@@ -58,6 +60,10 @@ fun TaskListScreen(
 ) {
     val taskList by taskViewModel.taskList.collectAsState()
     val taskState by taskViewModel.task.collectAsState()
+
+    LaunchedEffect(Unit) {
+        taskViewModel.findAllTasks()
+    }
 
     var isRefreshing by remember { mutableStateOf(false) }
 
@@ -190,12 +196,14 @@ private fun TaskListContent(
     ) {
         items(
             items = taskList,
-            key = { task -> task.id }
+            key = { task -> task.id ?: 0 }
         ) { task ->
             TaskItem(
                 task = task,
                 onClick = {
-                    navController.navigate("taskDetail/${task.id}")
+                    task.id?.let { id ->
+                        navController.navigate(NavRoutes.TaskDetail.createRoute(id))
+                    }
                 }
             )
         }

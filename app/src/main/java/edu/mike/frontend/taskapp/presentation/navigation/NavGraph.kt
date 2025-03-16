@@ -1,4 +1,4 @@
-package edu.mike.frontend.taskapp.navigation
+package edu.mike.frontend.taskapp.presentation.navigation
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
@@ -9,7 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import edu.mike.frontend.taskapp.presentation.ui.screens.TaskDetailScreen
 import edu.mike.frontend.taskapp.presentation.ui.screens.TaskListScreen
-import edu.mike.frontend.taskapp.viewmodel.TaskViewModel
+import edu.mike.frontend.taskapp.presentation.viewmodel.TaskViewModel
 
 /**
  * Sets up the navigation graph for the application.

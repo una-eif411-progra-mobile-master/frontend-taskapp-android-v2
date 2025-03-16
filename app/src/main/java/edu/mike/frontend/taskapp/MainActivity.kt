@@ -17,16 +17,35 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
-import edu.mike.frontend.taskapp.navigation.NavGraph
+import edu.mike.frontend.taskapp.data.datasource.TaskDataSourceImpl
+import edu.mike.frontend.taskapp.data.mapper.PriorityMapper
+import edu.mike.frontend.taskapp.data.mapper.StatusMapper
+import edu.mike.frontend.taskapp.data.mapper.TaskMapper
+import edu.mike.frontend.taskapp.data.repository.TaskRepositoryImpl
+import edu.mike.frontend.taskapp.presentation.factory.TaskViewModelFactory
+import edu.mike.frontend.taskapp.presentation.navigation.NavGraph
 import edu.mike.frontend.taskapp.presentation.ui.theme.TaskAppTheme
-import edu.mike.frontend.taskapp.viewmodel.TaskViewModel
+import edu.mike.frontend.taskapp.presentation.viewmodel.TaskViewModel
 
 /**
  * Main activity that serves as the entry point for the application.
  * Initializes the TaskViewModel and sets up the Compose UI with the main screen.
  */
 class MainActivity : ComponentActivity() {
-    private val taskViewModel: TaskViewModel by viewModels()
+    private val taskViewModel: TaskViewModel by viewModels {
+        // Create mappers
+        val priorityMapper = PriorityMapper()
+        val statusMapper = StatusMapper()
+        val taskMapper = TaskMapper(priorityMapper, statusMapper)
+
+        // Create data source with mapper
+        val dataSource = TaskDataSourceImpl(taskMapper)
+
+        // Create repository with data source and mapper
+        val taskRepository = TaskRepositoryImpl(dataSource, taskMapper)
+
+        TaskViewModelFactory(taskRepository)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
