@@ -1,92 +1,80 @@
 package edu.mike.frontend.taskapp.presentation.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import edu.mike.frontend.taskapp.data.datasource.TaskProvider
-import edu.mike.frontend.taskapp.data.model.Task
+import edu.mike.frontend.taskapp.domain.model.Task
+import edu.mike.frontend.taskapp.domain.repository.TaskRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 /**
  * Sealed class representing the various states of a task operation.
- *
- * States:
- * - Loading: Indicates an ongoing task fetch operation.
- * - Success: Contains the successfully retrieved task.
- * - Empty: Indicates no task is available.
  */
 sealed class TaskState {
+    /** Indicates an ongoing task operation */
     data object Loading : TaskState()
+
+    /** Contains the successfully retrieved task */
     data class Success(val task: Task) : TaskState()
+
+    /** Indicates no task is available */
     data object Empty : TaskState()
+
+    /** Contains an error message if the task operation fails */
+    data class Error(val message: String) : TaskState()
 }
 
 /**
- * ViewModel for managing task-related operations.
+ * ViewModel responsible for managing task-related UI state and business logic.
  *
- * Features:
- * - StateFlow for reactive state management.
- * - Coroutine integration with viewModelScope.
- * - Separation of mutable and immutable state.
- * - Task selection and full task list management.
+ * @property repository Repository interface for task operations
  */
-class TaskViewModel : ViewModel() {
+class TaskViewModel(
+    private val repository: TaskRepository
+) : ViewModel() {
 
-    // MutableStateFlow to hold the current task state
     private val _task = MutableStateFlow<TaskState>(TaskState.Empty)
-    val task: StateFlow<TaskState> get() = _task
+    val task: StateFlow<TaskState> = _task
 
-    // StateFlow to hold the current task selected by ID
     private val _selectedTask = MutableStateFlow<Task?>(null)
-    val selectedTask: StateFlow<Task?> get() = _selectedTask
+    val selectedTask: StateFlow<Task?> = _selectedTask
 
-    // StateFlow to hold the list of tasks
     private val _taskList = MutableStateFlow<List<Task>>(emptyList())
-    val taskList: StateFlow<List<Task>> get() = _taskList
+    val taskList: StateFlow<List<Task>> = _taskList
 
     /**
-     * Finds and sets the selected task by its ID.
+     * Finds a task by its ID and updates the [selectedTask] state.
      *
-     * @param taskId The ID of the task to retrieve.
+     * @param taskId The ID of the task to find
      */
     fun selectTaskById(taskId: Long) {
         viewModelScope.launch {
-            val task = _taskList.value.find { it.id == taskId } ?: TaskProvider.findTaskById(taskId)
-            _selectedTask.value = task
+            repository.findTaskById(taskId)
+                .onSuccess { task ->
+                    _selectedTask.value = task
+                }
+                .onFailure { exception ->
+                    Log.e("TaskViewModel", "Error fetching task by ID: ${exception.message}")
+                }
         }
     }
 
     /**
-     * Retrieves a random task from the TaskProvider.
-     *
-     * Steps:
-     * 1. Sets the task state to Loading.
-     * 2. Generates a random task ID.
-     * 3. Retrieves the task from the provider.
-     * 4. Updates the task state and selectedTask.
-     */
-    fun getTask() {
-        viewModelScope.launch {
-            _task.value = TaskState.Loading
-            val position = (1L..10L).random() // Generate random Long ID from 1 to 10
-            val task = TaskProvider.findTaskById(position)
-            _task.value = task?.let { TaskState.Success(it) } ?: TaskState.Empty
-            _selectedTask.value = task
-        }
-    }
-
-    /**
-     * Retrieves all available tasks from the TaskProvider.
-     *
-     * This function:
-     * 1. Fetches the complete task list.
-     * 2. Updates the taskList state with the retrieved data.
+     * Retrieves all available tasks and updates the [taskList] state.
+     * Should be called when the ViewModel is initialized or when a refresh is needed.
      */
     fun findAllTasks() {
         viewModelScope.launch {
-            val taskList = TaskProvider.findAllTasks()
-            _taskList.value = taskList
+            repository.findAllTasks()
+                .onSuccess { tasks ->
+                    Log.d("TaskViewModel", "Total Tasks: ${tasks.size}")
+                    _taskList.value = tasks
+                }
+                .onFailure { exception ->
+                    Log.e("TaskViewModel", "Failed to fetch tasks: ${exception.message}")
+                }
         }
     }
 }

@@ -19,47 +19,31 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import edu.mike.frontend.taskapp.data.model.Task
+import edu.mike.frontend.taskapp.domain.model.Task
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 /**
- * TaskItem is a composable that displays an individual task in a card format.
+ * TaskItem is a composable function that displays the details of a task in a card format.
  *
- * This component presents the task in a visually appealing card with proper hierarchy
- * highlighting important information like the title, while providing supporting details
- * such as notes, dates, priority and status in a structured format.
+ * Each task is displayed in a card with its title, notes (if available), and metadata like
+ * creation date, due date, priority, and status. The card is clickable to allow user interaction.
  *
- * The card is interactive, allowing users to select a task for detailed viewing or editing.
- * It includes proper accessibility support with semantic descriptions.
- *
- * @param task The task object containing all data to be displayed
- * @param onClick Callback function that is triggered when the task item is clicked
- * @param modifier Optional modifier for customizing the component's layout and appearance
+ * @param task The Task object containing all the data to be displayed.
+ * @param onClick Callback function that is triggered when the task item is clicked.
  */
 @Composable
-fun TaskItem(
-    task: Task,
-    onClick: (Task) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    // Format dates for display using a more user-friendly format
-    val dateFormatter = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
-
-    // Handle potential null dates gracefully
-    val createdDate = task.createdDate?.let { dateFormatter.format(it) } ?: "Not specified"
-    val dueDate = task.dueDate?.let { dateFormatter.format(it) } ?: "No due date"
-
-    // Prepare accessibility description
-    val taskDescription =
-        "Task: ${task.title}, Priority: ${task.priority.label}, Status: ${task.status.label}"
+fun TaskItem(task: Task, onClick: (Task) -> Unit) {
+    val dateFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    val createdDate = dateFormatter.format(task.createdDate)
+    val dueDate = dateFormatter.format(task.dueDate)
 
     Card(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .clickable { onClick(task) }
-            .semantics { contentDescription = taskDescription },
+            .semantics { contentDescription = "Task: ${task.title}" },
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
@@ -70,7 +54,6 @@ fun TaskItem(
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            // Task title with proper styling
             Text(
                 text = task.title,
                 style = MaterialTheme.typography.titleMedium,
@@ -78,7 +61,6 @@ fun TaskItem(
                 modifier = Modifier.padding(bottom = 4.dp)
             )
 
-            // Optional notes section if available
             if (!task.notes.isNullOrBlank()) {
                 Text(
                     text = task.notes,
@@ -90,7 +72,6 @@ fun TaskItem(
                 )
             }
 
-            // Task metadata displayed in a consistent format
             TaskMetadata(
                 label = "Created On:",
                 value = createdDate,
@@ -121,16 +102,12 @@ fun TaskItem(
 /**
  * A helper composable that displays a label-value pair used for task metadata.
  *
- * This component creates a consistent layout for displaying metadata fields with
- * proper styling and spacing. It helps maintain visual consistency across different
- * task-related views in the application.
- *
- * @param label The descriptive text label for the metadata field
- * @param value The actual value of the metadata field
- * @param modifier Optional modifier for customizing the layout
+ * @param label The descriptive text label for the metadata field.
+ * @param value The actual value of the metadata field.
+ * @param modifier Optional modifier for customizing the layout.
  */
 @Composable
-fun TaskMetadata(
+fun TaskMetadata(  // Remove the 'private' keyword here
     label: String,
     value: String,
     modifier: Modifier = Modifier

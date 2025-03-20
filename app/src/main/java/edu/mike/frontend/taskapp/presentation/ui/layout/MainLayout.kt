@@ -20,26 +20,18 @@ import edu.mike.frontend.taskapp.R
 /**
  * MainLayout is a composable that provides the standard layout structure for the application.
  *
- * This component establishes a consistent visual framework across all screens with:
- * - A prominent header displaying the app name with proper accessibility semantics
- * - A descriptive subtitle that reinforces the app's purpose
- * - A designated content area for screen-specific UI elements
- *
- * The layout automatically handles scaffold padding and applies Material Design 3 theming
- * for visual coherence throughout the application. It ensures that all screens maintain
- * the same branding and structure while allowing for unique content.
+ * It creates a consistent visual hierarchy with a branded header section containing the
+ * application name and subtitle, followed by the screen-specific content. This component
+ * handles proper padding and accessibility concerns while applying Material Design principles.
  *
  * @param paddingValues PaddingValues to be applied to the layout, typically from Scaffold
  * @param content The screen-specific content to be displayed within this layout
  */
 @Composable
 fun MainLayout(
-    paddingValues: PaddingValues, content: @Composable () -> Unit
+    paddingValues: PaddingValues,
+    content: @Composable () -> Unit
 ) {
-    // Get string resources before using in semantics
-    val appName = stringResource(id = R.string.app_name)
-    val appTitle = stringResource(id = R.string.app_title)
-
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -50,29 +42,30 @@ fun MainLayout(
             // App header section with primary branding
             Surface(
                 modifier = Modifier.fillMaxWidth(),
-                color = MaterialTheme.colorScheme.primary,
-                shadowElevation = 4.dp
+                color = MaterialTheme.colorScheme.primary
             ) {
                 Text(
-                    text = appName,
+                    text = stringResource(id = R.string.app_name),
                     style = MaterialTheme.typography.headlineMedium,
                     color = MaterialTheme.colorScheme.onPrimary,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 16.dp, bottom = 8.dp)
-                        .semantics { heading() })
+                        .semantics { heading() }
+                )
             }
 
             // App subtitle section
             Text(
-                text = appTitle,
+                text = stringResource(id = R.string.app_title),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 12.dp)
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .padding(bottom = 16.dp)
             )
 
             // Screen-specific content

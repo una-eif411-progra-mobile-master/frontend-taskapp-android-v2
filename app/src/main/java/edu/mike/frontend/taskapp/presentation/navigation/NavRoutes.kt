@@ -1,4 +1,4 @@
-package edu.mike.frontend.taskapp.navigation
+package edu.mike.frontend.taskapp.presentation.navigation
 
 /**
  * Contains all navigation route constants for the application.
@@ -15,5 +15,13 @@ sealed class NavRoutes {
         const val ARG_TASK_ID = "taskId" // Changed to uppercase with underscores
 
         fun createRoute(taskId: Long) = "taskDetail/$taskId"
+    }
+
+    /**
+     * Defines the route for the settings screen.
+     * This screen displays application configuration options.
+     */
+    data object Settings : NavRoutes() {
+        const val ROUTE = "settings"
     }
 }

@@ -1,5 +1,6 @@
 package edu.mike.frontend.taskapp.presentation.ui.components
 
+
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -18,7 +19,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
-import edu.mike.frontend.taskapp.navigation.BottomNavItem
+import edu.mike.frontend.taskapp.presentation.navigation.BottomNavItem
 import edu.mike.frontend.taskapp.presentation.viewmodel.TaskViewModel
 
 /**

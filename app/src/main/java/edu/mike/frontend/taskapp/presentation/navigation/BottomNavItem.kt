@@ -1,4 +1,4 @@
-package edu.mike.frontend.taskapp.navigation
+package edu.mike.frontend.taskapp.presentation.navigation
 
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
@@ -19,9 +19,9 @@ import edu.mike.frontend.taskapp.R
  * @property icon The vector icon to display in the navigation bar.
  */
 sealed class BottomNavItem(
-    val route: String,
+     val route: String,
     @StringRes val title: Int,
-    val icon: ImageVector
+     val icon: ImageVector
 ) {
     /**
      * Contains all the possible navigation routes as constants.
