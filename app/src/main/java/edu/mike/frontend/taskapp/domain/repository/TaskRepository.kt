@@ -8,7 +8,4 @@ import edu.mike.frontend.taskapp.domain.model.Task
 interface TaskRepository {
     suspend fun findAllTasks(): Result<List<Task>>
     suspend fun findTaskById(taskId: Long): Result<Task>
-    suspend fun saveTask(task: Task): Result<Unit>
-    suspend fun deleteTask(taskId: Long): Result<Unit>
-    suspend fun updateTask(task: Task): Result<Unit>
 }
