@@ -39,35 +39,6 @@ fun MainLayout(
         color = MaterialTheme.colorScheme.background
     ) {
         Column {
-            // App header section with primary branding
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                color = MaterialTheme.colorScheme.primary
-            ) {
-                Text(
-                    text = stringResource(id = R.string.app_name),
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 16.dp, bottom = 8.dp)
-                        .semantics { heading() }
-                )
-            }
-
-            // App subtitle section
-            Text(
-                text = stringResource(id = R.string.app_title),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-                    .padding(bottom = 16.dp)
-            )
-
             // Screen-specific content
             content()
         }

@@ -4,8 +4,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -13,9 +17,18 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import edu.mike.frontend.taskapp.data.datasource.TaskDataSourceImpl
 import edu.mike.frontend.taskapp.data.mapper.PriorityMapper
@@ -25,32 +38,22 @@ import edu.mike.frontend.taskapp.data.repository.TaskRepositoryImpl
 import edu.mike.frontend.taskapp.presentation.factory.TaskViewModelFactory
 import edu.mike.frontend.taskapp.presentation.navigation.NavGraph
 import edu.mike.frontend.taskapp.presentation.ui.components.BottomNavigationBar
+import edu.mike.frontend.taskapp.presentation.ui.layout.MainLayout
 import edu.mike.frontend.taskapp.presentation.ui.theme.TaskAppTheme
 import edu.mike.frontend.taskapp.presentation.viewmodel.TaskViewModel
 
-/**
- * Main activity that serves as the entry point for the application.
- * Initializes the TaskViewModel and sets up the Compose UI with the main screen.
- */
 class MainActivity : ComponentActivity() {
     private val taskViewModel: TaskViewModel by viewModels {
-        // Create mappers
         val priorityMapper = PriorityMapper()
         val statusMapper = StatusMapper()
         val taskMapper = TaskMapper(priorityMapper, statusMapper)
-
-        // Create data source with mapper
         val dataSource = TaskDataSourceImpl(taskMapper)
-
-        // Create repository with data source and mapper
         val taskRepository = TaskRepositoryImpl(dataSource, taskMapper)
-
         TaskViewModelFactory(taskRepository)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContent {
             TaskAppTheme {
                 MainScreen(taskViewModel)
@@ -59,19 +62,21 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-/**
- * Main screen composable that incorporates the top app bar and navigation system.
- * Sets up the application scaffold and initializes the navigation graph.
- *
- * @param taskViewModel The ViewModel that provides access to task data and business logic
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(taskViewModel: TaskViewModel) {
     val navController = rememberNavController()
+    val taskListState by taskViewModel.taskList.collectAsState()
+    var isLoading by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
         taskViewModel.findAllTasks()
+    }
+
+    LaunchedEffect(taskListState) {
+        if (taskListState.isNotEmpty()) {
+            isLoading = false
+        }
     }
 
     Scaffold(
@@ -82,7 +87,8 @@ fun MainScreen(taskViewModel: TaskViewModel) {
                         text = stringResource(id = R.string.app_name),
                         style = MaterialTheme.typography.headlineMedium
                     )
-                }, colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = MaterialTheme.colorScheme.onPrimary
                 )
@@ -90,36 +96,40 @@ fun MainScreen(taskViewModel: TaskViewModel) {
         },
         bottomBar = {
             BottomNavigationBar(navController = navController, taskViewModel = taskViewModel)
-        }) { paddingValues ->
-        NavGraph(
-            navController = navController,
-            taskViewModel = taskViewModel,
-            paddingValues = paddingValues
-        )
+        }
+    ) { paddingValues ->
+        if (isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .semantics { contentDescription = "Loading tasks" },
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        } else {
+            MainLayout(paddingValues = paddingValues) {
+                NavGraph(
+                    navController = navController,
+                    taskViewModel = taskViewModel,
+                    paddingValues = PaddingValues(0.dp)
+                )
+            }
+        }
     }
 }
 
-/**
- * Preview composable for the MainScreen.
- * Displays the application UI with the main navigation structure.
- */
 @Preview(showBackground = true)
 @Composable
 fun MainScreenPreview() {
     TaskAppTheme {
-        // Create a minimal MainScreen preview that doesn't require a real ViewModel
         PreviewMainScreen()
     }
 }
 
-/**
- * A simplified version of MainScreen for preview purposes only.
- * Uses static content instead of requiring a real ViewModel.
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun PreviewMainScreen() {
-
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -136,8 +146,6 @@ private fun PreviewMainScreen() {
             )
         }
     ) { paddingValues ->
-        // Display placeholder content instead of the actual NavGraph
-        // which requires a real ViewModel
         Text(
             text = "Preview: Navigation Content",
             modifier = Modifier.padding(paddingValues)
