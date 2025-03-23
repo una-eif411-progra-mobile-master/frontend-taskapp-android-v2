@@ -37,21 +37,23 @@ class TaskRepositoryImpl(
      * @throws DomainError.MappingError if there's an error mapping the data
      * @throws DomainError.UnknownError for unexpected errors
      */
-    override suspend fun findAllTasks(): Result<List<Task>> = runCatching {
-        dataSource.getTasks().first().map { taskDto ->
+    override suspend fun findAllTasks(): Result<List<Task>> = try {
+        val tasks = dataSource.getTasks().first().map { taskDto ->
             taskMapper.mapToDomain(taskDto)
         }
-    }.recoverCatching { throwable ->
-
-        // Log the error before throwing
-        Log.e(TAG, "Failed to fetch tasks", throwable)
-
-        when (throwable) {
-            is IOException -> throw DomainError.NetworkError("Failed to fetch tasks")
-            is IllegalArgumentException -> throw DomainError.MappingError("Error mapping tasks")
-            is DomainError -> throw throwable
-            else -> throw DomainError.UnknownError
-        }
+        Result.success(tasks)
+    } catch (e: IOException) {
+        Log.e(TAG, "Failed to fetch tasks", e)
+        Result.failure(DomainError.NetworkError("Failed to fetch tasks", e))
+    } catch (e: IllegalArgumentException) {
+        Log.e(TAG, "Error mapping tasks", e)
+        Result.failure(DomainError.MappingError("Error mapping tasks", e))
+    } catch (e: DomainError) {
+        Log.e(TAG, "Domain error occurred", e)
+        Result.failure(e)
+    } catch (e: Exception) {
+        Log.e(TAG, "Unknown error occurred", e)
+        Result.failure(DomainError.UnknownError("Unknown error", e))
     }
 
     /**
@@ -63,19 +65,21 @@ class TaskRepositoryImpl(
      * @throws DomainError.NetworkError if there's a network-related issue
      * @throws DomainError.MappingError if there's an error mapping the task
      */
-    override suspend fun findTaskById(taskId: Long): Result<Task> = runCatching {
-        val taskDto =
-            dataSource.getTaskById(taskId) ?: throw DomainError.TaskError("Task not found")
-        taskMapper.mapToDomain(taskDto)
-    }.recoverCatching { throwable ->
-
-        // Log the error before throwing
-        Log.e(TAG, "Failed to fetch task with ID: $taskId", throwable)
-        when (throwable) {
-            is IOException -> throw DomainError.NetworkError("Failed to fetch task")
-            is IllegalArgumentException -> throw DomainError.MappingError("Error mapping task")
-            is DomainError -> throw throwable
-            else -> throw DomainError.UnknownError
-        }
+    override suspend fun findTaskById(taskId: Long): Result<Task> = try {
+        val taskDto = dataSource.getTaskById(taskId) ?: throw DomainError.TaskError("Task not found")
+        val task = taskMapper.mapToDomain(taskDto)
+        Result.success(task)
+    } catch (e: IOException) {
+        Log.e(TAG, "Failed to fetch task with ID: $taskId", e)
+        Result.failure(DomainError.NetworkError("Failed to fetch task", e))
+    } catch (e: IllegalArgumentException) {
+        Log.e(TAG, "Error mapping task", e)
+        Result.failure(DomainError.MappingError("Error mapping task", e))
+    } catch (e: DomainError) {
+        Log.e(TAG, "Domain error occurred", e)
+        Result.failure(e)
+    } catch (e: Exception) {
+        Log.e(TAG, "Unknown error occurred", e)
+        Result.failure(DomainError.UnknownError("Unknown error", e))
     }
 }
