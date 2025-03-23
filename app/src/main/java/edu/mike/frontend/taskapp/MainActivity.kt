@@ -4,27 +4,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
@@ -54,6 +38,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
             TaskAppTheme {
                 MainScreen(taskViewModel)
@@ -62,7 +47,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(taskViewModel: TaskViewModel) {
     val navController = rememberNavController()
@@ -80,20 +64,6 @@ fun MainScreen(taskViewModel: TaskViewModel) {
     }
 
     Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(id = R.string.app_name),
-                        style = MaterialTheme.typography.headlineMedium
-                    )
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
-                )
-            )
-        },
         bottomBar = {
             BottomNavigationBar(navController = navController, taskViewModel = taskViewModel)
         }
@@ -112,7 +82,7 @@ fun MainScreen(taskViewModel: TaskViewModel) {
                 NavGraph(
                     navController = navController,
                     taskViewModel = taskViewModel,
-                    paddingValues = PaddingValues(0.dp)
+                    paddingValues = PaddingValues(0.dp) // MainLayout maneja el padding
                 )
             }
         }
@@ -123,32 +93,21 @@ fun MainScreen(taskViewModel: TaskViewModel) {
 @Composable
 fun MainScreenPreview() {
     TaskAppTheme {
-        PreviewMainScreen()
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun PreviewMainScreen() {
-    Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = {
+        Scaffold { paddingValues ->
+            MainLayout(paddingValues = paddingValues) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     Text(
-                        text = stringResource(id = R.string.app_name),
-                        style = MaterialTheme.typography.headlineMedium
+                        text = "Task List Content Preview",
+                        style = MaterialTheme.typography.bodyLarge
                     )
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
-                )
-            )
+                }
+            }
         }
-    ) { paddingValues ->
-        Text(
-            text = "Preview: Navigation Content",
-            modifier = Modifier.padding(paddingValues)
-        )
     }
 }
