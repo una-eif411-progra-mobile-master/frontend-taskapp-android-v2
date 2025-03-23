@@ -13,6 +13,7 @@ import edu.mike.frontend.taskapp.presentation.ui.screens.TaskListScreen
 import edu.mike.frontend.taskapp.presentation.viewmodel.TaskViewModel
 
 /**
+ * NavGraph uses the same routes for composable destination
  * Sets up the navigation graph for the application.
  *
  * This composable function configures the navigation structure between different screens in the app.

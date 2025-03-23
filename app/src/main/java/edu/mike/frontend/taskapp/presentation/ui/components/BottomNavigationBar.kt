@@ -23,6 +23,7 @@ import edu.mike.frontend.taskapp.presentation.navigation.BottomNavItem
 import edu.mike.frontend.taskapp.presentation.viewmodel.TaskViewModel
 
 /**
+ * BottomNavigationBar handles the UI and navigation logic
  * A composable that implements the bottom navigation bar for the application.
  *
  * The bottom navigation bar provides access to the main destinations in the app:
