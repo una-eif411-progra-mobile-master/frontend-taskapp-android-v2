@@ -43,16 +43,6 @@ sealed class BottomNavItem(
     )
 
     /**
-     * TaskDetail represents the navigation item for the task detail screen.
-     * This screen displays detailed information about a selected task.
-     */
-    data object TaskDetail : BottomNavItem(
-        Routes.TASK_DETAIL,
-        R.string.task_detail,
-        Icons.Filled.Info
-    )
-
-    /**
      * Settings represents the navigation item for the settings screen.
      * This screen allows users to configure application preferences.
      */
