@@ -1,4 +1,4 @@
-package edu.mike.frontend.taskapp.data.model
+package edu.mike.frontend.taskapp.data.remote.dto
 
 import java.util.Date
 

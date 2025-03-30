@@ -1,8 +1,8 @@
 package edu.mike.frontend.taskapp.data.mapper
 
-     import edu.mike.frontend.taskapp.data.model.PriorityDto
-     import edu.mike.frontend.taskapp.data.model.StatusDto
-     import edu.mike.frontend.taskapp.data.model.TaskDto
+     import edu.mike.frontend.taskapp.data.remote.dto.PriorityDto
+     import edu.mike.frontend.taskapp.data.remote.dto.StatusDto
+     import edu.mike.frontend.taskapp.data.remote.dto.TaskDto
      import edu.mike.frontend.taskapp.domain.model.Priority
      import edu.mike.frontend.taskapp.domain.model.Status
      import edu.mike.frontend.taskapp.domain.model.Task
