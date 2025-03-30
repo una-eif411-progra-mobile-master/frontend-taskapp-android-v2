@@ -4,74 +4,122 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
-import edu.mike.frontend.taskapp.navigation.NavGraph
+import edu.mike.frontend.taskapp.presentation.navigation.NavGraph
 import edu.mike.frontend.taskapp.presentation.ui.components.BottomNavigationBar
+import edu.mike.frontend.taskapp.presentation.ui.layout.MainLayout
+import edu.mike.frontend.taskapp.presentation.ui.theme.TaskAppTheme
 import edu.mike.frontend.taskapp.presentation.viewmodel.TaskViewModel
 
 /**
- * MainActivity is the entry point of the application.
- *
- * This activity is responsible for setting up the content view using Jetpack Compose and
- * initializing the necessary components for the user interface, such as the navigation graph,
- * view model, and bottom navigation.
- *
- * The MainActivity is annotated with [ComponentActivity] to support Jetpack Compose and
- * use lifecycle-aware components.
+ * Main activity that serves as the entry point for the application.
+ * Initializes the TaskViewModel and sets up the Compose UI with the main screen.
  */
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-
-    // The TaskViewModel instance is obtained using the viewModels() delegate, which allows
-    // this activity to share the same instance of the view model across configuration changes
-    // such as screen rotations.
+    /**
+     * ViewModel instance that manages task-related data and business logic.
+     * Injected by Hilt.
+     */
     private val taskViewModel: TaskViewModel by viewModels()
 
     /**
-     * The onCreate method is called when the activity is first created. It sets up the UI and
-     * initializes components such as the task list and navigation.
+     * Initializes the activity and sets up the Compose UI.
+     * Applies the app theme and renders the main screen.
      *
-     * In this method:
-     *  - The [taskViewModel] fetches all tasks.
-     *  - The [setContent] block sets the composable layout for the activity.
-     *  - The [Scaffold] composable is used to provide a structured layout that includes a
-     *    bottom navigation bar and content space.
+     * @param savedInstanceState If non-null, this activity is being re-constructed from a
+     * previous saved state as given here.
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Fetch all tasks when the activity is created.
-        taskViewModel.findAllTasks()
-
         setContent {
-            // RememberNavController is used to handle navigation between composable screens.
-            val navController = rememberNavController()
+            TaskAppTheme {
+                MainScreen(taskViewModel)
+            }
+        }
+    }
+}
 
-            /**
-             * Scaffold is a composable function that provides the basic structure of the app's UI.
-             * It includes the following slots:
-             * - `bottomBar`: A bottom navigation bar that allows users to switch between screens.
-             * - `content`: The area where the main screen content is shown, managed by the
-             *   [NavGraph] for navigation between different screens.
-             */
-            Scaffold(
-                // The BottomNavigationBar is provided as the bottom bar for the Scaffold. It allows
-                // navigation between different sections of the app, such as Task List and Settings.
-                bottomBar = { BottomNavigationBar(navController, taskViewModel) }
-            ) { innerPadding ->
-                // The content area is handled by the NavGraph composable, which defines
-                // the navigation logic between screens (Task List, Task Details, etc.).
-                // The `innerPadding` ensures the content is correctly padded, avoiding overlap
-                // with the bottom navigation bar.
+/**
+ * Main screen composable that serves as the container for the application UI.
+ * It handles loading states, initializes the navigation controller,
+ * and sets up the app's main layout structure.
+ *
+ * @param taskViewModel The ViewModel that provides access to task data and business logic
+ */
+@Composable
+fun MainScreen(taskViewModel: TaskViewModel) {
+    val navController = rememberNavController()
+    val taskListState by taskViewModel.taskList.collectAsState()
+    var isLoading by remember { mutableStateOf(true) }
+
+    // Initialize task data when the screen is first launched
+    LaunchedEffect(Unit) {
+        taskViewModel.findAllTasks()
+    }
+
+    // Update loading state when task list changes
+    LaunchedEffect(taskListState) {
+        if (taskListState.isNotEmpty()) {
+            isLoading = false
+        }
+    }
+
+    Scaffold(
+        bottomBar = {
+            BottomNavigationBar(navController = navController, taskViewModel = taskViewModel)
+        }
+    ) { paddingValues ->
+        if (isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .semantics { contentDescription = "Loading tasks" },
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        } else {
+            MainLayout(paddingValues = paddingValues) {
                 NavGraph(
                     navController = navController,
                     taskViewModel = taskViewModel,
-                    modifier = Modifier.padding(innerPadding)  // Pass the innerPadding as the modifier
+                    paddingValues = PaddingValues(0.dp) // MainLayout maneja el padding
                 )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MainScreenPreview() {
+    TaskAppTheme {
+        Scaffold { paddingValues ->
+            MainLayout(paddingValues = paddingValues) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Task List Content Preview",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
             }
         }
     }

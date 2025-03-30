@@ -1,17 +1,21 @@
 [versions]
-agp = "8.6.0"
+coreKtx = "1.15.0"
+coreTesting = "2.2.0"
 kotlin = "2.0.20"
-coreKtx = "1.13.1"
+agp = "8.9.1"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
-lifecycleRuntimeKtx = "2.8.5"
-activityCompose = "1.9.2"
-composeBom = "2024.09.01"
-navigationRuntimeKtx = "2.8.0"
-navigation-compose = "2.8.0"
+kotlinxCoroutinesTest = "1.7.3"
+lifecycleRuntimeKtx = "2.8.7"
+activityCompose = "1.10.1"
+composeBom = "2025.03.01"
+mockk = "1.13.9"
+navigationRuntimeKtx = "2.8.9"
+navigationCompose = "2.8.9"
+navigationRuntimeAndroid = "2.9.0-alpha09"
+cronetEmbedded = "119.6045.31"
 hilt = "2.52"
-ben-manes = "0.51.0"
 retrofit = "2.9.0"
 converterGson = "2.9.0"
 okhttp = "4.11.0"
@@ -19,6 +23,7 @@ okhttp-logging-interceptor = "4.11.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-core-testing = { module = "androidx.arch.core:core-testing", version.ref = "coreTesting" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -33,7 +38,12 @@ androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-man
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigationRuntimeKtx" }
-androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation-compose" }
+androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+androidx-navigation-runtime-android = { group = "androidx.navigation", name = "navigation-runtime-android", version.ref = "navigationRuntimeAndroid" }
+androidx-compose-material = { group = "androidx.compose.material", name = "material", version = "1.7.8" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+cronet-embedded = { group = "org.chromium.net", name = "cronet-embedded", version.ref = "cronetEmbedded" }
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
@@ -44,7 +54,6 @@ okhttp-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-i
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
-kotlin-kapt = { id = "org.jetbrains.kotlin.kapt" } ##TODO: No version ref added
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-ben-manes-versions = { id = "com.github.ben-manes.versions", version.ref = "ben-manes" }
+kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
+hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
