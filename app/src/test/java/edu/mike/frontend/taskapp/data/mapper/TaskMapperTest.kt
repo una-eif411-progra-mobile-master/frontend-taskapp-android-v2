@@ -25,7 +25,9 @@ package edu.mike.frontend.taskapp.data.mapper
           */
          @Before
          fun setUp() {
-             taskMapper = TaskMapper()
+             val priorityMapper = PriorityMapper()
+             val statusMapper = StatusMapper()
+             taskMapper = TaskMapper(priorityMapper, statusMapper)
          }
 
          /**
