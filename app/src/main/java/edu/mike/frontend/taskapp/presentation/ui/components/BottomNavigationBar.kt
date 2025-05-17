@@ -1,72 +1,92 @@
 package edu.mike.frontend.taskapp.presentation.ui.components
 
+
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
-import edu.mike.frontend.taskapp.navigation.BottomNavItem
+import edu.mike.frontend.taskapp.presentation.navigation.BottomNavItem
 import edu.mike.frontend.taskapp.presentation.viewmodel.TaskViewModel
 
 /**
- * BottomNavigationBar is a composable function that sets up the bottom navigation bar for the application.
+ * BottomNavigationBar handles the UI and navigation logic
+ * A composable that implements the bottom navigation bar for the application.
  *
- * This navigation bar allows users to switch between different screens such as the task list, task detail, and settings.
+ * The bottom navigation bar provides access to the main destinations in the app:
+ * - Task List: The main screen displaying all tasks
+ * - Settings: Application configuration options
  *
- * @param navController The NavController used for navigation between screens.
- * @param taskViewModel The ViewModel instance used to observe the task data.
+ * Navigation between these destinations is handled with proper back stack management,
+ * ensuring that users can navigate through the app in an intuitive way.
+ *
+ * @param navController The navigation controller that manages app navigation
+ * @param taskViewModel The view model that provides access to task data
  */
 @Composable
 fun BottomNavigationBar(navController: NavController, taskViewModel: TaskViewModel) {
-    val items = listOf(
-        BottomNavItem.TaskList,
-        BottomNavItem.TaskDetail,
-        BottomNavItem.Settings
-    )
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
 
     NavigationBar(
-        containerColor = Color.Blue,
+        containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
+        modifier = Modifier.fillMaxWidth(),
     ) {
-        val navBackStackEntry by navController.currentBackStackEntryAsState()
-        val currentRoute = navBackStackEntry?.destination?.route
+        BottomNavItem.items().forEach { item ->
+            val isSelected = currentDestination?.hierarchy?.any {
+                it.route == item.route
+            } ?: false
 
-        items.forEach { item ->
+            // Get string resource outside of the semantics block
+            val itemTitle = stringResource(id = item.title)
+            val itemDescription = if (isSelected) {
+                "$itemTitle, selected"
+            } else {
+                "$itemTitle, not selected"
+            }
+
             NavigationBarItem(
                 icon = {
                     Icon(
                         imageVector = item.icon,
-                        contentDescription = stringResource(id = item.title)
+                        contentDescription = null
                     )
                 },
-                label = { Text(text = stringResource(id = item.title)) },
-                selected = currentRoute == item.route,
+                label = {
+                    Text(
+                        text = itemTitle,
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                },
+                selected = isSelected,
                 onClick = {
-                    when (item) {
-                        is BottomNavItem.TaskDetail -> {
-                            val firstTask = taskViewModel.taskList.value.firstOrNull()
-                            if (firstTask != null) {
-                                navController.navigate("taskDetail/${firstTask.id}")
-                            } else {
-                                // Handle the case when there is no task
-                                // Maybe show a Toast or SnackBar message to inform the user
-                            }
+                    navController.navigate(item.route) {
+                        // Pop up to the start destination of the graph to
+                        // avoid building up a large stack of destinations
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
                         }
-
-                        else -> {
-                            navController.navigate(item.route) {
-                                navController.graph.startDestinationRoute?.let { route ->
-                                    popUpTo(route) { saveState = true }
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        }
+                        // Avoid multiple copies of the same destination
+                        launchSingleTop = true
+                        // Restore state when navigating back
+                        restoreState = true
                     }
+                },
+                modifier = Modifier.semantics {
+                    contentDescription = itemDescription
                 }
             )
         }
