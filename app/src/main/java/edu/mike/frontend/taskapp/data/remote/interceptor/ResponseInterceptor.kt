@@ -1,5 +1,6 @@
 package edu.mike.frontend.taskapp.data.remote.interceptor
 
+import android.util.Log
 import okhttp3.Interceptor
 import okhttp3.Response
 import okhttp3.ResponseBody.Companion.toResponseBody
@@ -27,7 +28,7 @@ class ResponseInterceptor @Inject constructor() : Interceptor {
         val responseBodyString = response.body?.string()
 
         // Log the raw response
-        println("Raw Response: $responseBodyString")
+        Log.d("ResponseInterceptor", "Raw Response: $responseBodyString")
 
         // Return the response by re-creating the body with the intercepted content
         return response.newBuilder()
