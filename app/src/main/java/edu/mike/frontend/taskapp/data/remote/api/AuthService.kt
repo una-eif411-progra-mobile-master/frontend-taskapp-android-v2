@@ -22,6 +22,6 @@ interface AuthService {
     /**
      * Logs out the current user session
      */
-    @POST("users/logout")
+    @POST("users/logout") //TODO: Pending in backend
     suspend fun logout(): Response<Unit>
 }
