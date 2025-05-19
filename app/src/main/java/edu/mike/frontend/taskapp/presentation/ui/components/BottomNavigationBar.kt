@@ -1,8 +1,11 @@
 package edu.mike.frontend.taskapp.presentation.ui.components
 
-
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -20,6 +23,7 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import edu.mike.frontend.taskapp.presentation.navigation.BottomNavItem
+import edu.mike.frontend.taskapp.presentation.viewmodel.LoginViewModel
 import edu.mike.frontend.taskapp.presentation.viewmodel.TaskViewModel
 
 /**
@@ -29,15 +33,21 @@ import edu.mike.frontend.taskapp.presentation.viewmodel.TaskViewModel
  * The bottom navigation bar provides access to the main destinations in the app:
  * - Task List: The main screen displaying all tasks
  * - Settings: Application configuration options
+ * - Logout: Button to sign out of the application
  *
  * Navigation between these destinations is handled with proper back stack management,
  * ensuring that users can navigate through the app in an intuitive way.
  *
  * @param navController The navigation controller that manages app navigation
  * @param taskViewModel The view model that provides access to task data
+ * @param loginViewModel The view model that handles authentication state and logout functionality
  */
 @Composable
-fun BottomNavigationBar(navController: NavController, taskViewModel: TaskViewModel) {
+fun BottomNavigationBar(
+    navController: NavController,
+    taskViewModel: TaskViewModel,
+    loginViewModel: LoginViewModel
+) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
@@ -88,6 +98,23 @@ fun BottomNavigationBar(navController: NavController, taskViewModel: TaskViewMod
                 modifier = Modifier.semantics {
                     contentDescription = itemDescription
                 }
+            )
+        }
+
+        // Add spacer to push logout button to the end
+        Spacer(modifier = Modifier.weight(1f))
+
+        // Logout button
+        IconButton(
+            onClick = { loginViewModel.logout() },
+            modifier = Modifier.semantics {
+                contentDescription = "Logout button"
+            }
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurface
             )
         }
     }

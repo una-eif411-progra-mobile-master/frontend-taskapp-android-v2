@@ -6,9 +6,15 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import edu.mike.frontend.taskapp.data.di.NetworkModule.BASE_URL
+import edu.mike.frontend.taskapp.data.local.AuthPreferences
+import edu.mike.frontend.taskapp.data.remote.api.AuthService
 import edu.mike.frontend.taskapp.data.remote.api.TaskService
+import edu.mike.frontend.taskapp.data.remote.dto.AuthResponseDto
 import edu.mike.frontend.taskapp.data.remote.dto.TaskDto
+import edu.mike.frontend.taskapp.data.remote.interceptor.AuthInterceptor
 import edu.mike.frontend.taskapp.data.remote.interceptor.ResponseInterceptor
+import edu.mike.frontend.taskapp.data.remote.serializer.AuthResponseDeserializer
 import edu.mike.frontend.taskapp.data.remote.serializer.TaskDeserializer
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -22,7 +28,7 @@ import javax.inject.Singleton
  *
  * This module is responsible for providing singleton instances of:
  * - Gson for JSON serialization/deserialization
- * - HTTP client configuration with logging and custom interceptors
+ * - HTTP client configuration with logging
  * - Retrofit service configuration
  * - API service interfaces
  *
@@ -31,12 +37,11 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-
     private const val BASE_URL = "https://628ae68e667aea3a3e23e474.mockapi.io/api/v1/"
     private const val DATE_FORMAT = "yyyy-MM-dd"
 
     /**
-     * Provides a singleton [Gson] instance configured with custom type adapters and date format.
+     * Provides a singleton Gson instance configured with custom type adapters.
      *
      * @return Configured [Gson] instance
      */
@@ -44,47 +49,59 @@ object NetworkModule {
     @Singleton
     fun provideGson(): Gson = GsonBuilder()
         .registerTypeAdapter(TaskDto::class.java, TaskDeserializer())
+        .registerTypeAdapter(AuthResponseDto::class.java, AuthResponseDeserializer())
         .setDateFormat(DATE_FORMAT)
         .create()
 
     /**
-     * Provides a singleton [HttpLoggingInterceptor] for HTTP request/response logging.
+     * Provides a logging interceptor for HTTP request/response logging.
      *
      * @return Configured [HttpLoggingInterceptor]
      */
     @Provides
     @Singleton
-    fun provideLoggingInterceptor(): HttpLoggingInterceptor =
-        HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
-        }
+    fun provideLoggingInterceptor(): HttpLoggingInterceptor = HttpLoggingInterceptor()
+        .apply { level = HttpLoggingInterceptor.Level.BODY }
 
     /**
-     * Provides a singleton [OkHttpClient] configured with logging and response interceptors,
-     * and reasonable timeout settings.
+     * Provides the auth interceptor for adding authentication headers to requests.
+     *
+     * @param authPreferences The preferences storing authentication data
+     * @return Configured [AuthInterceptor]
+     */
+    @Provides
+    @Singleton
+    fun provideAuthInterceptor(authPreferences: AuthPreferences): AuthInterceptor =
+        AuthInterceptor(authPreferences)
+
+    /**
+     * Provides a configured OkHttpClient with interceptors.
      *
      * @param loggingInterceptor For logging HTTP traffic
-     * @param responseInterceptor For handling API responses globally
+     * @param responseInterceptor For handling API responses
+     * @param authInterceptor For adding authentication headers to requests
      * @return Configured [OkHttpClient]
      */
     @Provides
     @Singleton
     fun provideOkHttpClient(
         loggingInterceptor: HttpLoggingInterceptor,
-        responseInterceptor: ResponseInterceptor
+        responseInterceptor: ResponseInterceptor,
+        authInterceptor: AuthInterceptor
     ): OkHttpClient = OkHttpClient.Builder()
         .addInterceptor(loggingInterceptor)
         .addInterceptor(responseInterceptor)
+        .addInterceptor(authInterceptor)
         .connectTimeout(30, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
         .writeTimeout(30, TimeUnit.SECONDS)
         .build()
 
     /**
-     * Provides a singleton [Retrofit] instance configured with Gson converter and OkHttp client.
+     * Provides a configured Retrofit instance.
      *
-     * @param okHttpClient The configured HTTP client
-     * @param gson The Gson instance for JSON serialization
+     * @param okHttpClient The HTTP client to use
+     * @param gson The Gson instance for JSON conversion
      * @return Configured [Retrofit] instance
      */
     @Provides
@@ -99,13 +116,24 @@ object NetworkModule {
         .build()
 
     /**
-     * Provides the implementation of the [TaskService] API interface.
+     * Provides the TaskService implementation.
      *
-     * @param retrofit The Retrofit instance used to create the service
+     * @param retrofit The Retrofit instance
      * @return Implementation of [TaskService]
      */
     @Provides
     @Singleton
     fun provideTaskService(retrofit: Retrofit): TaskService =
         retrofit.create(TaskService::class.java)
+
+    /**
+     * Provides the AuthService implementation for authentication operations.
+     *
+     * @param retrofit The Retrofit instance
+     * @return Implementation of [AuthService]
+     */
+    @Provides
+    @Singleton
+    fun provideAuthService(retrofit: Retrofit): AuthService =
+        retrofit.create(AuthService::class.java)
 }

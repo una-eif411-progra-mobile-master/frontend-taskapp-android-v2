@@ -1,32 +1,41 @@
 package edu.mike.frontend.taskapp.presentation.navigation
 
 /**
- * NavRoutes defines all possible destinations
- * Contains all navigation route constants for the application.
- *
- * Using a sealed class with objects ensures type safety and prevents errors from misspelled route strings.
+ * Contains navigation route constants used throughout the app.
+ * Each nested object represents a destination screen with its route and any required arguments.
  */
-sealed class NavRoutes {
-    data object TaskList : NavRoutes() {
+object NavRoutes {
+    /**
+     * Task list screen showing all available tasks
+     */
+    object TaskList {
         const val ROUTE = "taskList"
     }
 
     /**
-     * Defines the route for the task detail screen.
-     * This screen displays detailed information about a specific task.
+     * Task detail screen showing detailed information for a specific task
      */
-    data object TaskDetail : NavRoutes() {
-        const val ROUTE = "taskDetail/{taskId}"
-        const val ARG_TASK_ID = "taskId" // Changed to uppercase with underscores
+    object TaskDetail {
+        const val ARG_TASK_ID = "taskId"
+        const val ROUTE = "taskDetail/{$ARG_TASK_ID}"
 
-        fun createRoute(taskId: Long) = "taskDetail/$taskId"
+        /**
+         * Creates a route to a specific task with the given ID
+         */
+        fun createRoute(taskId: Long): String = "taskDetail/$taskId"
     }
 
     /**
-     * Defines the route for the settings screen.
-     * This screen displays application configuration options.
+     * Settings screen for application configuration
      */
-    data object Settings : NavRoutes() {
+    object Settings {
         const val ROUTE = "settings"
+    }
+
+    /**
+     * Login screen for authentication
+     */
+    object Login {
+        const val ROUTE = "login"
     }
 }
