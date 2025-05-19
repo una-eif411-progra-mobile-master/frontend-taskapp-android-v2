@@ -59,8 +59,8 @@ fun LoginScreen(
     val isLoading by loginViewModel.isLoading.collectAsState()
 
     // Local UI state
-    var username by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("admin@guzmanalan.com") } //TODO: The email is hardcoded for testing
+    var password by remember { mutableStateOf("12345") } //TODO: The password is hardcoded for testing
     var passwordVisible by remember { mutableStateOf(false) }
 
     // Navigate on successful login

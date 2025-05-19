@@ -48,12 +48,31 @@ class AuthRemoteDataSource @Inject constructor(
             val response = authService.login(testRequest)
 
             if (response.isSuccessful) {
-                response.body()?.let {
-                    Log.d("AuthRemoteDataSource", "Login successful with response: $it")
-                    Result.success(AuthMapper.dtoToAuthResult(it))
-                } ?: run {
-                    Log.e("AuthRemoteDataSource", "Login response body was null")
-                    Result.failure(Exception("Response body was null"))
+                // Extract the token from the Authorization header
+                val authHeader = response.headers()["Authorization"]
+
+                if (!authHeader.isNullOrBlank()) {
+                    Log.d(
+                        "AuthRemoteDataSource",
+                        "Found token in Authorization header: ${authHeader.take(15)}..."
+                    )
+                    return@withContext Result.success(AuthResult(
+                        token = authHeader,
+                        userId = "" //TODO: For the future
+                    ))
+                }
+
+                // Fallback to response body if header is not present
+                val body = response.body()
+                return@withContext if (body != null) {
+                    Log.d("AuthRemoteDataSource", "Login successful with response body: $body")
+                    Result.success(AuthMapper.dtoToAuthResult(body))
+                } else {
+                    Log.e(
+                        "AuthRemoteDataSource",
+                        "Login response body was null and no Authorization header found"
+                    )
+                    Result.failure(Exception("No token found in response"))
                 }
             } else {
                 val errorBody = response.errorBody()?.string()
@@ -61,11 +80,11 @@ class AuthRemoteDataSource @Inject constructor(
                     "AuthRemoteDataSource",
                     "Login failed with code ${response.code()}: $errorBody"
                 )
-                Result.failure(Exception("API error ${response.code()}: $errorBody"))
+                return@withContext Result.failure(Exception("API error ${response.code()}: $errorBody"))
             }
         } catch (e: Exception) {
             Log.e("AuthRemoteDataSource", "Login exception: ${e.message}", e)
-            Result.failure(e)
+            return@withContext Result.failure(e)
         }
     }
 

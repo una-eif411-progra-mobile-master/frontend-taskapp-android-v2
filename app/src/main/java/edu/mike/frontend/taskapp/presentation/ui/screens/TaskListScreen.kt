@@ -67,14 +67,15 @@ fun TaskListScreen(
 
     var isRefreshing by remember { mutableStateOf(false) }
 
-    // Update refreshing state based on task state
-    isRefreshing = taskState is TaskState.Loading
+    // Update isRefreshing when taskState changes
+    LaunchedEffect(taskState) {
+        isRefreshing = taskState is TaskState.Loading
+    }
 
     @OptIn(androidx.compose.material.ExperimentalMaterialApi::class)
     val pullRefreshState = rememberPullRefreshState(
         refreshing = isRefreshing,
         onRefresh = {
-            isRefreshing = true
             taskViewModel.findAllTasks()
         }
     )
@@ -196,12 +197,12 @@ private fun TaskListContent(
     ) {
         items(
             items = taskList,
-            key = { task -> task.id ?: 0 }
+            key = { task -> task.id }
         ) { task ->
             TaskItem(
                 task = task,
                 onClick = {
-                    task.id?.let { id ->
+                    task.id.let { id ->
                         navController.navigate(NavRoutes.TaskDetail.createRoute(id))
                     }
                 }
