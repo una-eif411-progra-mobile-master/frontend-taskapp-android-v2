@@ -56,10 +56,12 @@ class AuthRemoteDataSource @Inject constructor(
                         "AuthRemoteDataSource",
                         "Found token in Authorization header: ${authHeader.take(15)}..."
                     )
-                    return@withContext Result.success(AuthResult(
-                        token = authHeader,
-                        userId = "" //TODO: For the future
-                    ))
+                    return@withContext Result.success(
+                        AuthResult(
+                            token = authHeader,
+                            userId = "" // Using empty string as placeholder
+                        )
+                    )
                 }
 
                 // Fallback to response body if header is not present
@@ -76,11 +78,20 @@ class AuthRemoteDataSource @Inject constructor(
                 }
             } else {
                 val errorBody = response.errorBody()?.string()
+                // Specific error handling based on HTTP status code
+                val errorMessage = when (response.code()) {
+                    403 -> "Invalid username or password"
+                    401 -> "Unauthorized access"
+                    404 -> "Service not found"
+                    500 -> "Server error occurred"
+                    else -> "API error ${response.code()}: $errorBody"
+                }
+
                 Log.e(
                     "AuthRemoteDataSource",
-                    "Login failed with code ${response.code()}: $errorBody"
+                    "Login failed: $errorMessage"
                 )
-                return@withContext Result.failure(Exception("API error ${response.code()}: $errorBody"))
+                return@withContext Result.failure(Exception(errorMessage))
             }
         } catch (e: Exception) {
             Log.e("AuthRemoteDataSource", "Login exception: ${e.message}", e)
@@ -111,7 +122,13 @@ class AuthRemoteDataSource @Inject constructor(
             } ?: Result.failure(Exception("Response body was null"))
         } else {
             val errorBody = response.errorBody()?.string()
-            Result.failure(Exception("API error ${response.code()}: $errorBody"))
+            // Improved error handling
+            val errorMessage = when (response.code()) {
+                403 -> "Invalid username or password"
+                401 -> "Unauthorized access"
+                else -> "API error ${response.code()}: $errorBody"
+            }
+            Result.failure(Exception(errorMessage))
         }
     } catch (e: Exception) {
         Result.failure(e)
