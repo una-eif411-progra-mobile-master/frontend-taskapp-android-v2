@@ -1,5 +1,6 @@
 package edu.mike.frontend.taskapp.presentation.ui.screens
 
+// Add these imports at the top of your file
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -8,16 +9,18 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -59,9 +62,14 @@ fun LoginScreen(
     val isLoading by loginViewModel.isLoading.collectAsState()
 
     // Local UI state
-    var username by remember { mutableStateOf("admin@guzmanalan.com") } //TODO: The email is hardcoded for testing
-    var password by remember { mutableStateOf("12345") } //TODO: The password is hardcoded for testing
+    var username by remember { mutableStateOf("admin@guzmanalan.com") } //TODO: This is for testing only
+    var password by remember { mutableStateOf("12345") } //TODO: This is for testing only
     var passwordVisible by remember { mutableStateOf(false) }
+
+    // Validation states
+    val isEmailValid =
+        username.isEmpty() || username.matches(Regex("[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+"))
+    val isPasswordValid = password.isEmpty() || password.length >= 5
 
     // Navigate on successful login
     LaunchedEffect(loginState) {
@@ -92,6 +100,15 @@ fun LoginScreen(
             modifier = Modifier.padding(bottom = 32.dp)
         )
 
+        // Show loading indicator at the top of the form when loading
+        if (loginState is LoginState.Loading) {
+            LinearProgressIndicator(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
+            )
+        }
+
         OutlinedTextField(
             value = username,
             onValueChange = { username = it },
@@ -104,11 +121,27 @@ fun LoginScreen(
             },
             singleLine = true,
             enabled = !isLoading,
+            isError = !isEmailValid,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 16.dp),
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+                .padding(bottom = 8.dp),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Email,
+                imeAction = ImeAction.Next
+            )
         )
+
+        // Email validation error
+        if (!isEmailValid) {
+            Text(
+                text = "Please enter a valid email address",
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, bottom = 8.dp)
+            )
+        }
 
         OutlinedTextField(
             value = password,
@@ -123,30 +156,61 @@ fun LoginScreen(
             trailingIcon = {
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
                     Icon(
-                        imageVector = if (passwordVisible) Icons.Default.Close else Icons.Default.Check,
+                        imageVector = if (passwordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
                         contentDescription = if (passwordVisible) "Hide password" else "Show password"
                     )
                 }
             },
             singleLine = true,
             enabled = !isLoading,
+            isError = !isPasswordValid,
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 24.dp),
+                .padding(bottom = 8.dp),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Password,
                 imeAction = ImeAction.Done
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    if (!isLoading && isEmailValid && isPasswordValid &&
+                        username.isNotEmpty() && password.isNotEmpty()
+                    ) {
+                        loginViewModel.login(username, password)
+                    }
+                }
             )
         )
 
+        // Password validation error
+        if (!isPasswordValid) {
+            Text(
+                text = "Password must be at least 5 characters long",
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, bottom = 8.dp)
+            )
+        }
+
         when (loginState) {
             is LoginState.Error -> {
-                Text(
-                    text = (loginState as LoginState.Error).message,
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        text = (loginState as LoginState.Error).message,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+
+                    TextButton(
+                        onClick = { loginViewModel.resetLoginState() },
+                        modifier = Modifier.align(Alignment.End)
+                    ) {
+                        Text("Retry")
+                    }
+                }
             }
 
             else -> { /* Don't show anything for other states */
@@ -157,8 +221,10 @@ fun LoginScreen(
             onClick = { loginViewModel.login(username, password) },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(50.dp),
-            enabled = !isLoading && username.isNotEmpty() && password.isNotEmpty()
+                .height(50.dp)
+                .padding(top = 8.dp),
+            enabled = !isLoading && isEmailValid && isPasswordValid &&
+                    username.isNotEmpty() && password.isNotEmpty()
         ) {
             if (isLoading) {
                 CircularProgressIndicator(
