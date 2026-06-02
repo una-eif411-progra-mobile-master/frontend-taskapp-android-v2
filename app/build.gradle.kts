@@ -12,7 +12,7 @@ android {
     defaultConfig {
         applicationId = "edu.mike.frontend.taskapp"
         minSdk = 32
-        targetSdk = 35
+        targetSdk = 37
         versionCode = 1
         versionName = "1.0"
 
