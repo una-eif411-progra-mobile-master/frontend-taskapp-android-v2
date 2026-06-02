@@ -66,13 +66,21 @@ dependencies {
     implementation(libs.androidx.navigation.runtime.android)
     implementation(libs.androidx.compose.material)
     implementation(libs.cronet.embedded)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
+    implementation(libs.androidx.material.icons.extended)
+
+    // Retrofit and Gson dependencies
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging.interceptor)
+
+    // Hilt dependencies
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
+
+    // DataStore Preferences
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.datastore.core)
 
     // Testing
     testImplementation(libs.junit)
@@ -89,19 +97,4 @@ dependencies {
     // Debug
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-
-    // Retrofit and Gson dependencies
-    implementation(libs.retrofit)
-    implementation(libs.converter.gson)
-    implementation(libs.okhttp)
-    implementation(libs.okhttp.logging.interceptor)
-
-    // Hilt dependencies
-    implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)
-
-    // DataStore Preferences
-    implementation(libs.androidx.datastore.preferences)
-    implementation(libs.androidx.datastore.preferences.core)
-    implementation(libs.androidx.material.icons.extended)
 }

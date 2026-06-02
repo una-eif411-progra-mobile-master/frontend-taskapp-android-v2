@@ -52,7 +52,7 @@ converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", ve
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
 okhttp-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp-logging-interceptor" }
 androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
-androidx-datastore-preferences-core = { group = "androidx.datastore", name = "datastore-preferences-core", version.ref = "datastore" }
+androidx-datastore-core = { group = "androidx.datastore", name = "datastore-preferences-core", version.ref = "datastore" }
 androidx-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version = "1.7.8" }
 
 [plugins]
